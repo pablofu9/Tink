@@ -6,13 +6,38 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		D8CDF9242D5A09C400173F00 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = D8CDF9232D5A09C400173F00 /* GoogleSignIn */; };
+		D8CDF9262D5A09C400173F00 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = D8CDF9252D5A09C400173F00 /* GoogleSignInSwift */; };
+		D8CDF9292D5A0A1300173F00 /* FirebaseAppCheck in Frameworks */ = {isa = PBXBuildFile; productRef = D8CDF9282D5A0A1300173F00 /* FirebaseAppCheck */; };
+		D8CDF92B2D5A0A1300173F00 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = D8CDF92A2D5A0A1300173F00 /* FirebaseAuth */; };
+		D8CDF92D2D5A0A1300173F00 /* FirebaseAuthCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = D8CDF92C2D5A0A1300173F00 /* FirebaseAuthCombine-Community */; };
+		D8CDF92F2D5A0A1300173F00 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = D8CDF92E2D5A0A1300173F00 /* FirebaseFirestore */; };
+		D8CDF9312D5A0A1300173F00 /* FirebaseFirestoreCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = D8CDF9302D5A0A1300173F00 /* FirebaseFirestoreCombine-Community */; };
+		D8CDF9332D5A0A1300173F00 /* FirebasePerformance in Frameworks */ = {isa = PBXBuildFile; productRef = D8CDF9322D5A0A1300173F00 /* FirebasePerformance */; };
+		D8CDF9352D5A0A1300173F00 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = D8CDF9342D5A0A1300173F00 /* FirebaseStorage */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		D8C717632D560C9F00D2A5BF /* Tink.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tink.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		D8C718D42D561ECE00D2A5BF /* Exceptions for "Tink" folder in "Tink" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = D8C717622D560C9F00D2A5BF /* Tink */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		D8C717652D560C9F00D2A5BF /* Tink */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				D8C718D42D561ECE00D2A5BF /* Exceptions for "Tink" folder in "Tink" target */,
+			);
 			path = Tink;
 			sourceTree = "<group>";
 		};
@@ -23,6 +48,15 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D8CDF9242D5A09C400173F00 /* GoogleSignIn in Frameworks */,
+				D8CDF9292D5A0A1300173F00 /* FirebaseAppCheck in Frameworks */,
+				D8CDF9352D5A0A1300173F00 /* FirebaseStorage in Frameworks */,
+				D8CDF9262D5A09C400173F00 /* GoogleSignInSwift in Frameworks */,
+				D8CDF92B2D5A0A1300173F00 /* FirebaseAuth in Frameworks */,
+				D8CDF92D2D5A0A1300173F00 /* FirebaseAuthCombine-Community in Frameworks */,
+				D8CDF92F2D5A0A1300173F00 /* FirebaseFirestore in Frameworks */,
+				D8CDF9332D5A0A1300173F00 /* FirebasePerformance in Frameworks */,
+				D8CDF9312D5A0A1300173F00 /* FirebaseFirestoreCombine-Community in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +99,15 @@
 			);
 			name = Tink;
 			packageProductDependencies = (
+				D8CDF9232D5A09C400173F00 /* GoogleSignIn */,
+				D8CDF9252D5A09C400173F00 /* GoogleSignInSwift */,
+				D8CDF9282D5A0A1300173F00 /* FirebaseAppCheck */,
+				D8CDF92A2D5A0A1300173F00 /* FirebaseAuth */,
+				D8CDF92C2D5A0A1300173F00 /* FirebaseAuthCombine-Community */,
+				D8CDF92E2D5A0A1300173F00 /* FirebaseFirestore */,
+				D8CDF9302D5A0A1300173F00 /* FirebaseFirestoreCombine-Community */,
+				D8CDF9322D5A0A1300173F00 /* FirebasePerformance */,
+				D8CDF9342D5A0A1300173F00 /* FirebaseStorage */,
 			);
 			productName = Tink;
 			productReference = D8C717632D560C9F00D2A5BF /* Tink.app */;
@@ -86,14 +129,18 @@
 				};
 			};
 			buildConfigurationList = D8C7175E2D560C9F00D2A5BF /* Build configuration list for PBXProject "Tink" */;
-			developmentRegion = en;
+			developmentRegion = es;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				en,
 				Base,
+				es,
 			);
 			mainGroup = D8C7175A2D560C9F00D2A5BF;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				D8CDF9222D5A09C400173F00 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+				D8CDF9272D5A0A1300173F00 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = D8C717642D560C9F00D2A5BF /* Products */;
 			projectDirPath = "";
@@ -241,17 +288,20 @@
 		};
 		D8C717732D560CA100D2A5BF /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = D8C717652D560C9F00D2A5BF /* Tink */;
+			baseConfigurationReferenceRelativePath = Configuration/XCConfiguration/tink_Dev.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Tink/Tink.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = "$(CONFIG_APP_BUNDLE_IDENTIFIER)";
 				DEVELOPMENT_ASSET_PATHS = "\"Tink/Preview Content\"";
 				DEVELOPMENT_TEAM = PDD535BCSR;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Tink/Info.plist;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -260,37 +310,41 @@
 				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.2;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = pfuertes.Tink;
+				MARKETING_VERSION = "$(CONFIG_APP_VERSION)";
+				PRODUCT_BUNDLE_IDENTIFIER = "$(CONFIG_APP_BUNDLE_IDENTIFIER)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TARGETED_DEVICE_FAMILY = 1;
 				XROS_DEPLOYMENT_TARGET = 2.2;
 			};
 			name = Debug;
 		};
 		D8C717742D560CA100D2A5BF /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = D8C717652D560C9F00D2A5BF /* Tink */;
+			baseConfigurationReferenceRelativePath = Configuration/XCConfiguration/tink_Pro.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Tink/Tink.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = "$(CONFIG_APP_BUNDLE_IDENTIFIER)";
 				DEVELOPMENT_ASSET_PATHS = "\"Tink/Preview Content\"";
 				DEVELOPMENT_TEAM = PDD535BCSR;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Tink/Info.plist;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -299,20 +353,21 @@
 				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.2;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = pfuertes.Tink;
+				MARKETING_VERSION = "$(CONFIG_APP_VERSION)";
+				PRODUCT_BUNDLE_IDENTIFIER = "$(CONFIG_APP_BUNDLE_IDENTIFIER)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TARGETED_DEVICE_FAMILY = 1;
 				XROS_DEPLOYMENT_TARGET = 2.2;
 			};
 			name = Release;
@@ -339,6 +394,73 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		D8CDF9222D5A09C400173F00 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.0.0;
+			};
+		};
+		D8CDF9272D5A0A1300173F00 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.8.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		D8CDF9232D5A09C400173F00 /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D8CDF9222D5A09C400173F00 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+		D8CDF9252D5A09C400173F00 /* GoogleSignInSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D8CDF9222D5A09C400173F00 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignInSwift;
+		};
+		D8CDF9282D5A0A1300173F00 /* FirebaseAppCheck */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D8CDF9272D5A0A1300173F00 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAppCheck;
+		};
+		D8CDF92A2D5A0A1300173F00 /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D8CDF9272D5A0A1300173F00 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		D8CDF92C2D5A0A1300173F00 /* FirebaseAuthCombine-Community */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D8CDF9272D5A0A1300173F00 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = "FirebaseAuthCombine-Community";
+		};
+		D8CDF92E2D5A0A1300173F00 /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D8CDF9272D5A0A1300173F00 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+		D8CDF9302D5A0A1300173F00 /* FirebaseFirestoreCombine-Community */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D8CDF9272D5A0A1300173F00 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = "FirebaseFirestoreCombine-Community";
+		};
+		D8CDF9322D5A0A1300173F00 /* FirebasePerformance */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D8CDF9272D5A0A1300173F00 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebasePerformance;
+		};
+		D8CDF9342D5A0A1300173F00 /* FirebaseStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D8CDF9272D5A0A1300173F00 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseStorage;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = D8C7175B2D560C9F00D2A5BF /* Project object */;
 }

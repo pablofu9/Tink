@@ -1,0 +1,88 @@
+/* 
+  Localizable.strings
+  Tink
+
+  Created by Pablo Fuertes ruiz on 10/2/25.
+  
+*/
+
+/*************************************/
+// MARK: - COMMON
+/*************************************/
+"ACCEPT"                                        = "Aceptar";
+"GOBACK"                                        = "Volver";
+"ALERT"                                         = "Aviso";
+"CITIES"                                        = "Ciudades";
+"COUNTRIES"                                     = "Paises";
+"NEW_TRAVEL"                                    = "Viaje";
+"SEARCH"                                        = "Buscar";
+"RESULTS"                                       = "Resultados";
+"CREATE"                                        = "Crear";
+
+/*************************************/
+// MARK: - LOGIN VIEW
+/*************************************/
+"LOGIN_WELCOME_BACK"                            = "Bienvenido de nuevo";
+"LOGIN_LOG"                                     = "Inicia sesión";
+"LOGIN_EMAIL"                                   = "Correo electrónico";
+"LOGIN_PASSWORD"                                = "Contraseña";
+"LOGIN_FORGOT_PASSWORD"                         = "¿Has olvidado tu contraseña?";
+"LOGIN_BUTTON_TEXT"                             = "Login";
+"LOGIN_TEXT_OR_CONTINUE"                        = "O continúa con";
+"GOOGLE_LOGIN"                                  = "Google";
+"APPLE_LOGIN"                                   = "Apple";
+"LOGIN_NO_ACC"                                  = "¿No tienes cuenta?";
+
+/*************************************/
+// MARK: - SIGN UP VIEW
+/*************************************/
+"SIGN_UP_HEADER"                                = "Crea tu cuenta";
+"SIGN_UP_REPEAT_PASSWORD"                       = "Repite la contraseña";
+"SIGN_UP_BUTTON"                                = "Regístrate";
+"SIGN_UP_ALREADY_ACC"                           = "¿Ya tienes cuenta?";
+"SIGN_UP_EMAIL_SENT"                            = "Correo enviado";
+"SIGN_UP_EMAIL_SENT_BODY"                       = "Siga las instrucciones que le han llegado al correo para recuperar la contraseña";
+
+
+/*************************************/
+// MARK: - FORGOT PASSWORD
+/*************************************/
+"FORGOT_PASSWORD_HEADER"                        = "¿Has olvidado tu contraseña?";
+"FORGTO_PASSWORD_BODY"                          = "No te preocupes, te enviaremos un correo de recuperación";
+"FORGOT_PASSWORD_BUTTON"                        = "Recuperar contraseña";
+    
+/*************************************/
+// MARK: - LOGIN ERRORS
+/*************************************/
+"LOGIN_ERROR_INVALID"                           = "Correo electrónico no válido";
+"LOGIN_ERROR_INVALID_PASS"                      = "Contraseña incorrecta";
+"LOGIN_ERROR_INVALID_USER"                      = "Usuario incorrecto";
+"LOGIN_ERROR_NETWORK"                           = "Ha habido un problema de conexión, inténtelo más tarde";
+"LOGIN_ERROR_UNKNOW"                            = "Error desconocido";
+"LOGIN_ERROR_EMAIL"                             = "El campo email no puede estar vacío";
+"LOGIN_ERROR_PASS"                              = "El campo contraseña no puede estar vacío";
+"LOGIN_DEFAULT_ERROR"                           = "Email o contraseña incorrectos";
+
+/*************************************/
+// MARK: - SIGN UP ERRRORS
+/*************************************/
+"LOGIN_ERROR_INVALID"                           = "Correo electrónico no válido";
+"LOGIN_ERROR_PASSWORD_NOT_MATCH"                = "Las contraseñas no coinciden";
+"LOGIN_ERROR_EMAIL_IN_USE"                      = "Este email ya ha sido registrado, incie sesión";
+"LOGIN_ERROR_WEAK_PASS"                         = "Su contraseña es demasiado débil";
+"LOGIN_ERROR_EMPTY_FIELD"                       = "Este campo no puede estar vacío";
+
+/*************************************/
+// MARK: - SETTINGS
+/*************************************/
+"SETTINGS_HEADER"                               = "Ajustes";
+"SETTINGS_ACCOUNT"                              = "Cuenta";
+"SETTINGS_LOGOUT"                               = "Cerrar sesión";
+"SETTINGS_THEME"                                = "Modo oscuro";
+"ALERT_LOGOUT_BODY"                             = "¿Estás seguro de que quieres cerrar sesión?";
+
+/*************************************/
+// MARK: - DATES
+/*************************************/
+"START_DATE"                                    = "Fecha de inicio";
+"END_DATE"                                      = "Fecha de fin";

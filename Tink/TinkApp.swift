@@ -9,9 +9,18 @@ import SwiftUI
 
 @main
 struct TinkApp: App {
+    
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+    @State private var authenticatorManager: AuthenticatorManager
+    
+    init() {
+        _authenticatorManager = State(wrappedValue: AuthenticatorManager())
+    }
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            SplashScreenView()
+                .environment(authenticatorManager)
         }
     }
 }

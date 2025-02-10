@@ -1,0 +1,16 @@
+//
+//  tink_Pro.xcconfig
+//  Tink
+//
+//  Created by Pablo Fuertes ruiz on 7/2/25.
+//
+
+// Configuration settings file format documentation can be found at:
+// https://help.apple.com/xcode/#/dev745c5c974
+
+CONFIG_APP_NAME                 = Tink
+CONFIG_APP_VERSION              = 1
+CONFIG_APP_BUILD_NUMBER         = 1
+CONFIG_APP_BUNDLE_IDENTIFIER    = com.pfuertes.tink
+
+APPICON_NAME                    = AppIcon
