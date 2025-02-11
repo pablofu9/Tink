@@ -84,7 +84,8 @@ struct CategoriesView_Previews: PreviewProvider {
         return GeometryReader { proxy in
             HomeView(proxy: proxy) // Aquí se pasa el proxy correctamente
                 .environmentObject(mockManager)
+                .ignoresSafeArea()
         }
-        .previewLayout(.sizeThatFits) // Opcional, solo para ajustar el layout en el preview
+        .previewLayout(.sizeThatFits)
     }
 }
