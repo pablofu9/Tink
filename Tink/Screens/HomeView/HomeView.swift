@@ -15,24 +15,9 @@ struct HomeView: View {
     
     var body: some View {
         ZStack {
-            ScrollView(.horizontal) {
-                HStack(spacing: 10) {
-                    ForEach(databaseManager.categories) { category in
-                        categoryCapsule(category)
-                    }
-                }
-                .safeAreaInset(edge: .leading) {
-                    Color.clear
-                        .frame(width: Measures.kHomeHorizontalPadding, height: 0)
-                }
-                .safeAreaInset(edge: .trailing) {
-                    Color.clear
-                        .frame(width: Measures.kHomeHorizontalPadding, height: 0)
-                }
-            }
-            .safeAreaTopPadding(proxy: proxy)
-            .scrollIndicators(.hidden)
+            CategoryCapsuleView(selectedCategory: $selectedCategory, categories: databaseManager.categories)
         }
+        .safeAreaTopPadding(proxy: proxy)
         .onAppear {
             Task {
                 await databaseManager.fetchCategories()
@@ -43,34 +28,13 @@ struct HomeView: View {
     }
 }
 
-
+// MARK: - SUBVIEWS
 extension HomeView {
     
-    @ViewBuilder
-    private func categoryCapsule(_ category: FSCategory) -> some View {
-        Button {
-            withAnimation(.easeIn(duration: 0.2)) {
-                selectedCategory = category
-            }
-        } label: {
-            Text(category.name)
-                .font(.custom(CustomFonts.regular, size: 18))
-                .foregroundStyle(selectedCategory == category ? ColorManager.defaultWhite : ColorManager.primaryGrayColor)
-                .padding(.horizontal, 9)
-                .padding(.vertical, 2)
-                .background {
-                    if selectedCategory == category {
-                        Capsule()
-                            .fill(ColorManager.primaryBasicColor)
-                    } else {
-                        Capsule()
-                            .stroke(lineWidth: 1)
-                            .foregroundStyle(ColorManager.primaryGrayColor.opacity(0.5))
-                    }
-                }
-        }
-    }
+
 }
+
+
 struct CategoriesView_Previews: PreviewProvider {
     static var previews: some View {
         let mockManager = FSDatabaseManager()

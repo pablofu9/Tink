@@ -16,10 +16,12 @@ class FSDatabaseManager: ObservableObject {
     @Published var loading: Bool = false
     
     func fetchCategories() async {
+        categories = []
         let db = Firestore.firestore()
-        let query = db.collection("categoríes") // Ojo con la tilde en "categories"
+        let query = db.collection("categoríes")
         loading = true
-
+        // Delay to pretend loading
+        try? await Task.sleep(nanoseconds: 5_000_000_000)
         do {
             let snapshot = try await query.getDocuments()
             self.categories = snapshot.documents.compactMap { document in
@@ -28,10 +30,6 @@ class FSDatabaseManager: ObservableObject {
         } catch {
             print("Error al obtener categorías: \(error.localizedDescription)")
         }
-
-        // Asegurar que loading esté activo al menos 5 segundos
-        try? await Task.sleep(nanoseconds: 5_000_000_000) // 5 segundos
-
         loading = false
     }
 }
