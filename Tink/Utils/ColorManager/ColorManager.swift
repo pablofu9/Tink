@@ -16,5 +16,6 @@ struct ColorManager {
     static let primaryBasicColor                       = Color("primaryBasicColor")
     static let primaryGrayColor                        = Color("primaryGrayColor")
     static let secondaryGrayColor                      = Color("secondaryGrayColor")
-    static let cancelColor                             = Color("cancelColor")          
+    static let cancelColor                             = Color("cancelColor")
+    static let bgColor                                 = Color("bgColor")
 }

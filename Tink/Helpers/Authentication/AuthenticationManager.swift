@@ -27,8 +27,10 @@ class AuthenticatorManager: NSObject, ASAuthorizationControllerDelegate {
     func startListeningToAuthState() async {
         Task {
             _ = Auth.auth().addStateDidChangeListener { _, user in
-                self.authState = user != nil ? .authenticated : .notAuthenticated
-                self.finishCheckAuth = true
+                withAnimation(.smooth) {
+                    self.authState = user != nil ? .authenticated : .notAuthenticated
+                    self.finishCheckAuth = true
+                }
             }
         }
     }

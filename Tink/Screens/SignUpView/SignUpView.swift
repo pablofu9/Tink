@@ -47,10 +47,9 @@ extension SignUpView {
     @ViewBuilder
     private var content: some View {
         GeometryReader { proxy in
+            header
             ScrollView(.vertical) {
                 LazyVStack(alignment: .leading ,spacing: 10) {
-                    header
-                    Spacer(minLength: 70)
                     formView
                     signUpbutton
                         .padding(.top, 37)
@@ -70,12 +69,11 @@ extension SignUpView {
                 }
                 .padding(.horizontal, Measures.kHomeHorizontalPadding)
             }
+            .padding(.top, Measures.kTopShapeHeight)
             .zIndex(2)
             .scrollBounceBehavior(.basedOnSize)
-            
-            topShape
-                .ignoresSafeArea()
         }
+        .ignoresSafeArea()
         .background(ColorManager.defaultWhite)
         .onTapGesture {
             focus = nil
@@ -86,15 +84,20 @@ extension SignUpView {
     /// Header view
     @ViewBuilder
     private var header: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(spacing: 20) {
-                backIcon
-                Text("SIGN_UP_HEADER".localized)
-                    .font(.custom(CustomFonts.bold, size: 30))
-                    .foregroundStyle(ColorManager.defaultWhite)
+        ZStack {
+            topShape
+            VStack(alignment: .leading, spacing: 10) {
+                HStack(spacing: 20) {
+                    backIcon
+                    Text("SIGN_UP_HEADER".localized)
+                        .font(.custom(CustomFonts.bold, size: 30))
+                        .foregroundStyle(ColorManager.defaultWhite)
+                }
+                .padding(.horizontal, Measures.kHomeHorizontalPadding)
             }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            
+        }.ignoresSafeArea()
     }
     
     /// Form view
@@ -298,7 +301,6 @@ extension SignUpView {
             .frame(maxWidth: .infinity)
             .frame(height: Measures.kTopShapeHeight, alignment: .top)
             .foregroundStyle(ColorManager.primaryBasicColor)
-            .zIndex(1)
     }
 }
 

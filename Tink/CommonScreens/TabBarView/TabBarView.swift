@@ -47,10 +47,14 @@ extension TabBarView {
                 .padding(.horizontal, Measures.kHomeHorizontalPadding)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .frame(height: Measures.kTabBarHeight)
+                .overlay {
+                    CustomTabBarShape()
+                        .stroke(lineWidth: 1)
+                        .foregroundStyle(ColorManager.primaryGrayColor.opacity(0.2))
+                }
                 .background {
                     CustomTabBarShape()
-                        .foregroundStyle(ColorManager.defaultWhite)
-                        .shadow(color: ColorManager.primaryGrayColor.opacity(0.3), radius: 2, x: 0, y: -2)
+                        .fill(ColorManager.defaultWhite)
                 }
             }
         }
@@ -79,7 +83,7 @@ extension TabBarView {
                 .foregroundStyle(activeTab == tab ? ColorManager.primaryBasicColor : ColorManager.primaryGrayColor.opacity(0.6))
                 .symbolEffect(.bounce, value: animatedTab.wrappedValue.isAnimating)
         }
-        .padding(.bottom, 10)
+        .padding(.bottom, 15)
     }
     
     @ViewBuilder

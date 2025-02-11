@@ -21,7 +21,8 @@ struct MainView: View {
     // MARK: - PROPERTIES
     @State private var activeTab: TabModel = .home
     @State private var isMiddlePressed: Bool = false
-    
+    @EnvironmentObject var databaseManager: FSDatabaseManager
+
     var body: some View {
         content
     }
@@ -30,10 +31,10 @@ struct MainView: View {
 extension MainView {
     
     @ViewBuilder
-    private func getSelectedView() -> some View {
+    private func getSelectedView(_ proxy: GeometryProxy) -> some View {
         switch activeTab {
         case .home:
-            EmptyView()
+            HomeView(proxy: proxy)
         case .settings:
             SettingsView()
         case .chat:
@@ -48,19 +49,25 @@ extension MainView {
     private var content: some View {
         GeometryReader { proxy in
             ZStack(alignment: .bottom, content: {
-                getSelectedView()
+                getSelectedView(proxy)
                 ZStack {
                     TabBarView(activeTab: $activeTab, isMiddlePressed: $isMiddlePressed)
                 }
                 .frame(maxHeight: .infinity, alignment: .bottom)
             })
+            .ignoresSafeArea()
+            .overlay {
+                if databaseManager.loading {
+                    LoadingView()
+                }
+            }
         }
-        .ignoresSafeArea()
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 
 #Preview {
     MainView()
+        .environmentObject(FSDatabaseManager())
 }
 

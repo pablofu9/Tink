@@ -11,7 +11,8 @@ struct CoordinatorStack<AuthCoordinatorPages: Coordinatable>: View {
     
     let root: AuthCoordinatorPages
     @State private var coordinator = Coordinator<AuthCoordinatorPages>()
-    
+    @EnvironmentObject var databaseManager: FSDatabaseManager
+
     init(_ root: AuthCoordinatorPages) {
         self.root = root
     }

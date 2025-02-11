@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D84AE8FC2D5BA0870069672D /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = D84AE8FB2D5BA0870069672D /* Lottie */; };
 		D8CDF9242D5A09C400173F00 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = D8CDF9232D5A09C400173F00 /* GoogleSignIn */; };
 		D8CDF9262D5A09C400173F00 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = D8CDF9252D5A09C400173F00 /* GoogleSignInSwift */; };
 		D8CDF9292D5A0A1300173F00 /* FirebaseAppCheck in Frameworks */ = {isa = PBXBuildFile; productRef = D8CDF9282D5A0A1300173F00 /* FirebaseAppCheck */; };
@@ -53,6 +54,7 @@
 				D8CDF9352D5A0A1300173F00 /* FirebaseStorage in Frameworks */,
 				D8CDF9262D5A09C400173F00 /* GoogleSignInSwift in Frameworks */,
 				D8CDF92B2D5A0A1300173F00 /* FirebaseAuth in Frameworks */,
+				D84AE8FC2D5BA0870069672D /* Lottie in Frameworks */,
 				D8CDF92D2D5A0A1300173F00 /* FirebaseAuthCombine-Community in Frameworks */,
 				D8CDF92F2D5A0A1300173F00 /* FirebaseFirestore in Frameworks */,
 				D8CDF9332D5A0A1300173F00 /* FirebasePerformance in Frameworks */,
@@ -108,6 +110,7 @@
 				D8CDF9302D5A0A1300173F00 /* FirebaseFirestoreCombine-Community */,
 				D8CDF9322D5A0A1300173F00 /* FirebasePerformance */,
 				D8CDF9342D5A0A1300173F00 /* FirebaseStorage */,
+				D84AE8FB2D5BA0870069672D /* Lottie */,
 			);
 			productName = Tink;
 			productReference = D8C717632D560C9F00D2A5BF /* Tink.app */;
@@ -140,6 +143,7 @@
 			packageReferences = (
 				D8CDF9222D5A09C400173F00 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
 				D8CDF9272D5A0A1300173F00 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				D84AE8FA2D5BA0870069672D /* XCRemoteSwiftPackageReference "lottie-ios" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = D8C717642D560C9F00D2A5BF /* Products */;
@@ -312,6 +316,7 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
@@ -355,6 +360,7 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
@@ -396,6 +402,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		D84AE8FA2D5BA0870069672D /* XCRemoteSwiftPackageReference "lottie-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/airbnb/lottie-ios.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.5.1;
+			};
+		};
 		D8CDF9222D5A09C400173F00 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
@@ -415,6 +429,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		D84AE8FB2D5BA0870069672D /* Lottie */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D84AE8FA2D5BA0870069672D /* XCRemoteSwiftPackageReference "lottie-ios" */;
+			productName = Lottie;
+		};
 		D8CDF9232D5A09C400173F00 /* GoogleSignIn */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = D8CDF9222D5A09C400173F00 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;

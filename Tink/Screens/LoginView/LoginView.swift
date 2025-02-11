@@ -52,11 +52,9 @@ extension LoginView {
     @ViewBuilder
     private var content: some View {
         GeometryReader { proxy in
+            header
             ScrollView(.vertical) {
                 LazyVStack(alignment: .leading ,spacing: 10) {
-                    header
-                        .zIndex(2)
-                    Spacer(minLength: 50)
                     formView
                     loginButton
                         .padding(.top, 37)
@@ -76,12 +74,10 @@ extension LoginView {
                 }
                 .padding(.horizontal, Measures.kHomeHorizontalPadding)
             }
-            .zIndex(2)
+            .padding(.top, Measures.kTopShapeHeight)
             .scrollBounceBehavior(.basedOnSize)
-            topShape
-                .ignoresSafeArea()
         }
-        
+        .ignoresSafeArea()
         .background(ColorManager.defaultWhite)
         .onTapGesture {
             focus = nil
@@ -97,21 +93,23 @@ extension LoginView {
             .frame(maxWidth: .infinity)
             .frame(height: Measures.kTopShapeHeight, alignment: .top)
             .foregroundStyle(ColorManager.primaryBasicColor)
-            .zIndex(1)
     }
     
     /// Header view
     @ViewBuilder
     private var header: some View {
-        VStack(alignment: .leading,spacing: 0) {
-            Text("LOGIN_WELCOME_BACK".localized)
-                .font(.custom(CustomFonts.bold, size: 30))
-                .foregroundStyle(ColorManager.defaultWhite)
-            Text("LOGIN_LOG".localized)
-                .font(.custom(CustomFonts.regular, size: 16))
-                .foregroundStyle(ColorManager.defaultWhite)
+        ZStack {
+            topShape
+            VStack(alignment: .leading,spacing: 0) {
+                Text("LOGIN_WELCOME_BACK".localized)
+                    .font(.custom(CustomFonts.bold, size: 30))
+                    .foregroundStyle(ColorManager.defaultWhite)
+                Text("LOGIN_LOG".localized)
+                    .font(.custom(CustomFonts.regular, size: 16))
+                    .foregroundStyle(ColorManager.defaultWhite)
+            }
         }
-        .zIndex(2)
+        .ignoresSafeArea()
     }
     
     /// Form view
