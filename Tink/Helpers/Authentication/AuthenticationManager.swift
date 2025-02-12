@@ -11,6 +11,7 @@ import GoogleSignIn
 import FirebaseAuth
 import AuthenticationServices
 import CryptoKit
+import FirebaseFirestore
 
 @Observable
 class AuthenticatorManager: NSObject, ASAuthorizationControllerDelegate {
@@ -21,6 +22,7 @@ class AuthenticatorManager: NSObject, ASAuthorizationControllerDelegate {
     var authErrorResetPass: AuthErrorResetPassword?
     var finishCheckAuth: Bool = false
     private var currentNonce: String?
+    let initialService = InitialService()
     
     /// We watch for the auth status
     @MainActor
@@ -29,7 +31,6 @@ class AuthenticatorManager: NSObject, ASAuthorizationControllerDelegate {
             _ = Auth.auth().addStateDidChangeListener { _, user in
                 withAnimation(.smooth) {
                     self.authState = user != nil ? .authenticated : .notAuthenticated
-                    self.finishCheckAuth = true
                 }
             }
         }
@@ -122,8 +123,7 @@ class AuthenticatorManager: NSObject, ASAuthorizationControllerDelegate {
     }
     
     func resetProfile() {
-        UserDefaults.standard.profileName = ""
-        UserDefaults.standard.profileImage = ""
+        UserDefaults.standard.userSaved = nil
     }
 }
 
@@ -233,4 +233,10 @@ extension AuthenticatorManager {
     func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
         print("Error with apple auth: \(error.localizedDescription)")
     }
+}
+
+// MARK: - FIRESTORE USER
+extension AuthenticatorManager {
+    
+
 }

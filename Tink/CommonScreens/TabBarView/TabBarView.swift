@@ -18,7 +18,7 @@ struct TabBarView: View {
     }
     @Binding var isMiddlePressed: Bool
     @State private var isRotated: Bool = false
-
+    
     // MARK: - BODY
     var body: some View {
         content

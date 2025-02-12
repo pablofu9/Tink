@@ -28,19 +28,21 @@ struct MainView: View {
     }
 }
 
+// MARK: - SUBVIEWS
 extension MainView {
     
+    // Get selected view from tab bar
     @ViewBuilder
     private func getSelectedView(_ proxy: GeometryProxy) -> some View {
         switch activeTab {
         case .home:
             HomeView(proxy: proxy)
         case .settings:
-            SettingsView()
+            EmptyView()
         case .chat:
             EmptyView()
         case .profile:
-            EmptyView()
+            ProfileView(proxy: proxy)
         }
     }
     
@@ -56,9 +58,22 @@ extension MainView {
                 .frame(maxHeight: .infinity, alignment: .bottom)
             })
             .ignoresSafeArea()
-            .overlay {
-                if databaseManager.loading {
-                    LoadingView()
+        }
+        .overlay {
+            if databaseManager.loading {
+                LoadingView()
+            }
+        }
+        .overlay {
+            if databaseManager.goCompleteProfile {
+                CompleteProfileView(isMiddlePressed: $isMiddlePressed)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
+        }
+        .onChange(of: isMiddlePressed) {
+            if isMiddlePressed {
+                Task {
+                    try await databaseManager.checkIfUserExistInDatabase()
                 }
             }
         }
@@ -69,5 +84,6 @@ extension MainView {
 #Preview {
     MainView()
         .environmentObject(FSDatabaseManager())
+        .environment(AuthenticatorManager())
 }
 

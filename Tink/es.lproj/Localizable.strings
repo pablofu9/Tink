@@ -15,9 +15,18 @@
 "CITIES"                                        = "Ciudades";
 "COUNTRIES"                                     = "Paises";
 "NEW_TRAVEL"                                    = "Viaje";
-"SEARCH"                                        = "Buscar";
+"SEARCH"                                        = "Buscar...";
 "RESULTS"                                       = "Resultados";
 "CREATE"                                        = "Crear";
+"NAME"                                          = "Nombre";
+"COMPLETE_PROFILE"                              = "Completa tu perfíl";
+"DNI_NIE"                                       = "DNI / NIE";
+"COMMUNITY_AUT"                                 = "Comunidad autónoma";
+"SELECTE_COMUNNITY"                             = "Selecciona una comunidad";
+"PROVINCE"                                      = "Provincia";
+"LOCALITY"                                      = "Localidad";
+"CONTINUE"                                      = "Continuar";
+"PROFILE_HEADER"                                = "Tu cuenta";
 
 /*************************************/
 // MARK: - LOGIN VIEW

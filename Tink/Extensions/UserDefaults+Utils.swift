@@ -100,3 +100,20 @@ extension UserDefaults {
     }
 }
 
+
+// USER SAVED
+extension UserDefaults {
+    struct UserDefaultsUserSaved {
+        static let kUserSaved = "userSaved"
+    }
+    
+    var userSaved: User? {
+        get {
+            return get(objectType: User.self, forKey: UserDefaultsUserSaved.kUserSaved)
+        }
+        set {
+            set(object: newValue, forKey: UserDefaultsUserSaved.kUserSaved)
+            synchronize()
+        }
+    }
+}

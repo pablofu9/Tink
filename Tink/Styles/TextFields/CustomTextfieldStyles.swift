@@ -16,18 +16,17 @@ struct SearcherTextfieldStyle: TextFieldStyle {
             .font(.custom(CustomFonts.regular, size: 16))
             .foregroundStyle(ColorManager.primaryGrayColor)
             .accentColor(ColorManager.primaryGrayColor)
-            .padding(.leading, 15)
+            .padding(.leading, 45)
             .padding(.trailing, 40)
             .padding(.vertical, 8)
             .background(ColorManager.defaultWhite)
             .autocorrectionDisabled()
-            .clipShape(RoundedRectangle(cornerRadius: 35))
-            .shadow(color: ColorManager.defaultBlack.opacity(0.25), radius: 4, x: 0, y: 4)
+            .clipShape(RoundedRectangle(cornerRadius: 15))
             .minimumScaleFactor(0.9)
-            .overlay(alignment: .trailing) {
+            .overlay(alignment: .leading) {
                 Image(systemName: "magnifyingglass")
-                    .foregroundStyle(ColorManager.primaryGrayColor)
-                    .padding(.trailing, 15)
+                    .foregroundStyle(ColorManager.primaryGrayColor.opacity(0.4))
+                    .padding(.leading, 15)
             }
     }
 }
@@ -82,8 +81,9 @@ struct LoginTextField: TextFieldStyle {
     @Previewable @State var text: String = ""
     @Previewable @State var prompt: String = ""
     ZStack {
+        ColorManager.bgColor
         TextField("", text: $text)
-            .textFieldStyle(LoginTextField(focused: true))
+            .textFieldStyle(SearcherTextfieldStyle())
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .background(Color.gray)

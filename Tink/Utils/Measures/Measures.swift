@@ -13,4 +13,5 @@ struct Measures {
     static let kHomeHorizontalPadding: CGFloat                      = 26
     static let kVerticalPaddingIfNoSafeArea: CGFloat                = 30
     static let kTopShapeHeight: CGFloat                             = UIScreen.main.bounds.size.height * 0.25
+    static let kTopShapeHeightSmaller: CGFloat                      = UIScreen.main.bounds.size.height * 0.2
 }

@@ -107,28 +107,6 @@ extension SignUpView {
             emailField
             passwordField
             repeatPasswordView
-//                .submitLabel(.done)
-//                .onSubmit {
-//                    withAnimation {
-//                        focus = nil
-//                    }
-//                }
-//                .textFieldStyle(LoginTextField(focused: focus == .passwordFocus || focus == .passwordVisibleFocus , isPassword: !password.isEmpty ? true : false) {
-//                    if !password.isEmpty {
-//                        isPasswordVisible.toggle()
-//                        switch focus {
-//                        case .passwordFocus:
-//                            focus = .passwordVisibleFocus
-//                        case .passwordVisibleFocus:
-//                            focus = .passwordFocus
-//                        default:
-//                            return
-//                        }
-//                    }
-//                })
-                
-
-            
         }
     }
     

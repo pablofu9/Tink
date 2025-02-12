@@ -14,9 +14,12 @@ struct CategoryCapsuleView: View {
     
     // MARK: - BODY
      var body: some View {
+         
          let sortedCategories = categories.sorted {
-             ($0.id == "todas" ? 0 : 1) < ($1.id == "todas" ? 0 : 1)
-         }
+               if $0.name == "todas" { return true }
+               if $1.name == "todas" { return false }
+               return $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
+           }
          
          ScrollView(.horizontal) {
              HStack(spacing: 10) {
@@ -36,7 +39,7 @@ struct CategoryCapsuleView: View {
          .scrollIndicators(.hidden)
          .onChange(of: categories) {
              if !categories.isEmpty {
-                 if let todasCategory = categories.first(where: { $0.id == "todas" }) {
+                 if let todasCategory = categories.first(where: { $0.name == "todas" }) {
                      selectedCategory = todasCategory
                  }
              }
@@ -60,12 +63,13 @@ struct CategoryCapsuleView: View {
                     if selectedCategory == category {
                         Capsule()
                             .fill(ColorManager.primaryBasicColor)
-                    } else {
-                        Capsule()
-                            .stroke(lineWidth: 1)
-                            .foregroundStyle(ColorManager.primaryGrayColor.opacity(0.5))
+                            .transition(.blurReplace)
                     }
+                    Capsule()
+                        .stroke(lineWidth: 1)
+                        .foregroundStyle(ColorManager.primaryGrayColor.opacity(0.5))
                 }
+                .padding(.vertical, 3)
         }
     }
 }

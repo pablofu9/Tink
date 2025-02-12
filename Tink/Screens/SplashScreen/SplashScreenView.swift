@@ -59,7 +59,11 @@ extension SplashScreenView {
     private func checkAuthState() async {
         // 1 Second w8
         try? await Task.sleep(nanoseconds: 1_000_000_000)
-        await authenticatorManager.startListeningToAuthState()        
+        Task {
+            try await authenticatorManager.initialService.initialSynch()
+            await authenticatorManager.startListeningToAuthState()
+            self.authenticatorManager.finishCheckAuth = true
+        }
     }
     
     /// Top shape view
