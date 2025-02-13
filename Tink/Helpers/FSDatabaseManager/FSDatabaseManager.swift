@@ -152,6 +152,53 @@ class FSDatabaseManager: ObservableObject {
         }
         loading = false
     }
+    
+    func createNewSkill(skillName: String, skillDescription: String, skillPrice: String, category: FSCategory, isOnline: Bool? = nil) async throws {
+        
+        // 0. Control loading state
+        loading = true
+        
+        // Asegurarte de cambiar loading a false cuando el método termine (sin importar el resultado)
+        defer {
+            loading = false
+        }
+        
+        // 1. No user auth
+        guard let user = UserDefaults.standard.userSaved else {
+            return
+        }
+        
+        // 2. Missing fields
+        guard  !skillName.isEmpty, !skillDescription.isEmpty, !skillPrice.isEmpty else {
+            return
+        }
+        
+        var newSkill = Skill(
+            id: "",
+            name: skillName,
+            description: skillDescription,
+            price: skillPrice,
+            category: category,
+            user: user,
+            is_online: isOnline
+        )
+        
+        // 3. Reference skills collection
+        let db = Firestore.firestore()
+        let skillRef = db.collection("skills").document()
+        
+        do {
+            // 3. Save new skill in firestore
+            try skillRef.setData(from: newSkill)
+            
+            // 4. Obtain new id for firestore
+            newSkill.id = skillRef.documentID
+            
+            print("✅ New skill added to Firestore with ID: \(newSkill.id)")
+        } catch {
+            throw NSError(domain: "FirestoreError", code: 500, userInfo: [NSLocalizedDescriptionKey: "Error adding skill to Firestore: \(error.localizedDescription)"])
+        }
+    }
 }
 
 // MOCK FOR PREVIEWS

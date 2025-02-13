@@ -270,9 +270,24 @@ extension NewSkillView {
     private var createAnnounce: some View {
         Button {
             Task {
-//                if let selectedCommunity, let provinceSelected, let selectedTown {
-//                    try await databaseManager.createNewUser(name: name, surname: surname, community: selectedCommunity.label, province: provinceSelected.label, locality: selectedTown.label)
-//                }
+                // 1. Change isMiddle pressed a false al terminar ejecucion
+                defer {
+                    isMiddlePressed = false
+                }
+                
+                do {
+                    if let selectedCategory {
+                        if let isManual = selectedCategory.is_manual {
+                            try await databaseManager.createNewSkill(skillName: skillName, skillDescription: skillDescription, skillPrice: price, category: selectedCategory)
+                        } else {
+                            if let isOnline = newSkillOnline {
+                                try await databaseManager.createNewSkill(skillName: skillName, skillDescription: skillDescription, skillPrice: price, category: selectedCategory, isOnline: isOnline == .online ? true : false)
+                            }
+                        }
+                    }
+                } catch {
+                    print("Error creating skill: \(error.localizedDescription)")
+                }
             }
         } label: {
             Text("NEW_SKILL_CREATE_ANNOUNCE".localized)

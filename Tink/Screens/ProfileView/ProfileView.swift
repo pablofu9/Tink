@@ -17,20 +17,17 @@ struct ProfileView: View {
     // MARK: - BODY
     var body: some View {
         ZStack(alignment: .top) {
-            
             ScrollView {
                 if let profileSaved = UserDefaults.standard.userSaved {
                     LazyVStack(alignment: .leading,spacing: 20) {
-                        
                         rowView(name: "person.fill", text: "NAME".localized, udText: "\(profileSaved.name) \(profileSaved.surname)")
                         rowView(name: "envelope.fill", text: "LOGIN_EMAIL".localized, udText: profileSaved.email)
-                        
                         rowView(name: "map.fill", text: "LOCALITY".localized, udText: "\(profileSaved.locality), \(profileSaved.province)")
                     }
                     .padding(.horizontal, Measures.kHomeHorizontalPadding)
                     .safeAreaInset(edge: .top) {
                         EmptyView()
-                            .frame(height: Measures.kTopShapeHeightSmaller - 10)
+                            .frame(height: Measures.kTopShapeHeightSmaller - 40)
                     }
                 }
             }
