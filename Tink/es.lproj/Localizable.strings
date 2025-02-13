@@ -27,6 +27,10 @@
 "LOCALITY"                                      = "Localidad";
 "CONTINUE"                                      = "Continuar";
 "PROFILE_HEADER"                                = "Tu cuenta";
+"SURNAME"                                       = "Apellidos";
+"TYPE_NAME"                                     = "Escribe tu nombre aquí";
+"TYPE_SURNAME"                                  = "Escribe tus apellidos aqui";
+"NEED_COMPLETE_PROFILE"                         = "Tienes que completar tu perfíl para empezar a crear anuncios";
 
 /*************************************/
 // MARK: - LOGIN VIEW
@@ -95,3 +99,23 @@
 /*************************************/
 "START_DATE"                                    = "Fecha de inicio";
 "END_DATE"                                      = "Fecha de fin";
+
+
+/*************************************/
+// MARK: - NEW SKILL VIEW
+/*************************************/
+
+"NEW_SKILL_HEADER"                              = "Crea tu anuncio";
+"NEW_SKILL_WDYD"                                = "¿Que sabes hacer?";
+"NEW_SKILL_ANNOUNCE_NAME"                       = "¿Qué ofreces?";
+"NEW_SKILL_ANNOUNCE_PROMPT"                     = "Ej: Clases particulares, fontanería...";
+"NEW_SKILL_DESCRIPTION_VIEW"                    = "Descripción del servicio";
+"NEW_SKILL_DESCRIPTION_PROMPT"                  = "Ej: Clases online de inglés nivel básico, servicios de fontanería generales...";
+"NEW_SKILL_SELECT_CATEGORY"                     = "Selecciona una categoría";
+"NEW_SKILL_PRICE"                               = "Precio";
+"NEW_SKILL_PRICE_PROPMT"                        = "Elige un precio";
+"NEW_SKILL_PRICE_FORMAT"                        = "Formato";
+"NEW_SKILL_ONLINE"                              = "Online";
+"NEW_SKILL_PRESENCIAL"                          = "Presencial";
+"NEW_SKILL_WHERE_OFFER"                         = "¿Donde ofreces el servicio?";
+"NEW_SKILL_CREATE_ANNOUNCE"                     = "Crear anuncio";

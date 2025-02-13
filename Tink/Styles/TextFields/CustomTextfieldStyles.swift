@@ -37,7 +37,7 @@ struct LoginTextField: TextFieldStyle {
    
     func _body(configuration: TextField<Self._Label>) -> some View {
         configuration
-            .font(.custom(CustomFonts.regular, size: 16))
+            .font(.custom(CustomFonts.regular, size: 17))
             .foregroundStyle(ColorManager.primaryGrayColor)
             .accentColor(ColorManager.primaryGrayColor)
             .padding(.leading, 15)
@@ -60,7 +60,7 @@ struct LoginTextField: TextFieldStyle {
                     RoundedRectangle(cornerRadius: 10)
                         .offset(x: 4, y: 4)
                         .foregroundStyle(ColorManager.primaryBasicColor)
-                        .transition(.move(edge: .top).combined(with: .opacity))
+                        .transition(.opacity)
                         .animation(.easeIn(duration: 0.3), value: focused)
                 }
             }
@@ -69,10 +69,12 @@ struct LoginTextField: TextFieldStyle {
                     RoundedRectangle(cornerRadius: 10)
                         .stroke(lineWidth: 2)
                         .foregroundStyle(ColorManager.primaryBasicColor)
-                        .transition(.move(edge: .top).combined(with: .opacity))
+                        .transition(.opacity)
                         .animation(.easeIn(duration: 0.3), value: focused)
                 }
             }
+            .animation(.easeInOut(duration: 0.3), value: focused)
+
     }
 }
 
@@ -88,3 +90,5 @@ struct LoginTextField: TextFieldStyle {
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .background(Color.gray)
 }
+
+

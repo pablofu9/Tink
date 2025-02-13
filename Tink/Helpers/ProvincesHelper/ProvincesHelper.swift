@@ -15,27 +15,16 @@ class ProvincesHelper: ObservableObject {
     @Published var communities: [AutonomousCommunity] = []
     @Published var provinces: [Province] = []
     @Published var towns: [Town] = []
-       
+    @Published var loading = false
+    
     func loadCommunities() {
         Task {
+            loading = true
+            defer { loading = false }
             do {
                 // 1. Fetch commnunities
                 let fetchedCommunities = try await provincesService.fectchProvinces()
-                //                let mockTowns = [
-                //                      Town(parentCode: "04", code: "1", label: "Almería"),
-                //                      Town(parentCode: "04", code: "2", label: "Roquetas de Mar"),
-                //                      Town(parentCode: "04", code: "3", label: "Adra")
-                //                  ]
-                //
-                //                  let mockProvinces = [
-                //                      Province(parentCode: "01", code: "04", label: "Almería", towns: mockTowns),
-                //                      Province(parentCode: "02", code: "06", label: "Granada", towns: mockTowns)
-                //                  ]
-                //
-                //                  let mockCommunities = [
-                //                      AutonomousCommunity(parentCode: "0", label: "Andalucía", code: "01", provinces: mockProvinces),
-                //                      AutonomousCommunity(parentCode: "0", label: "Cataluña", code: "09", provinces: mockProvinces)
-                //                  ]
+        
                 self.communities = fetchedCommunities
             } catch {
                 print("Error al cargar las comunidades: \(error.localizedDescription)")
@@ -61,7 +50,32 @@ class ProvincesHelper: ObservableObject {
 }
 
 // MARK: - MOCK
-extension ProvincesHelper {
+@MainActor
+class ProvincesHelperMock: ProvincesHelper {
     
-    
+    override func loadCommunities() {
+        Task {
+            loading = true
+            defer { loading = false }
+            try await Task.sleep(nanoseconds: 2_000_000_000)
+            
+            let mockTowns = [
+                Town(parentCode: "04", code: "1", label: "Almería"),
+                Town(parentCode: "04", code: "2", label: "Roquetas de Mar"),
+                Town(parentCode: "04", code: "3", label: "Adra")
+            ]
+            
+            let mockProvinces = [
+                Province(parentCode: "01", code: "04", label: "Almería", towns: mockTowns),
+                Province(parentCode: "02", code: "06", label: "Granada", towns: mockTowns)
+            ]
+            
+            let mockCommunities = [
+                AutonomousCommunity(parentCode: "0", label: "Andalucía", code: "01", provinces: mockProvinces),
+                AutonomousCommunity(parentCode: "0", label: "Cataluña", code: "09", provinces: mockProvinces)
+            ]
+            
+            self.communities = mockCommunities
+        }
+    }
 }

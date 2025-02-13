@@ -50,3 +50,16 @@ struct AutonomousCommunity: Codable, Hashable {
 }
 
 typealias FoodModelContainer = [AutonomousCommunity]
+
+
+extension Province: CustomStringConvertible {
+    var description: String { label }
+}
+
+extension Town: CustomStringConvertible {
+    var description: String { label }
+}
+
+extension AutonomousCommunity: CustomStringConvertible {
+    var description: String { label }
+}

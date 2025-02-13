@@ -7,8 +7,13 @@
 
 import Foundation
 
-struct FSCategory: Identifiable,Codable, Equatable {
+struct FSCategory: Identifiable,Codable, Equatable, Hashable {
     var id: String
     var name: String
     var is_manual: Bool?
+    var image_url: String?
+}
+
+extension FSCategory: CustomStringConvertible {
+    var description: String { name }
 }

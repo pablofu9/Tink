@@ -25,6 +25,14 @@ struct MainView: View {
 
     var body: some View {
         content
+            .onAppear {
+                Task {
+                    try await databaseManager.checkIfUserExistInDatabase()
+                }
+            }
+            .fullScreenCover(isPresented: $isMiddlePressed) {
+                NewSkillView(isMiddlePressed: $isMiddlePressed)
+            }
     }
 }
 
@@ -66,15 +74,8 @@ extension MainView {
         }
         .overlay {
             if databaseManager.goCompleteProfile {
-                CompleteProfileView(isMiddlePressed: $isMiddlePressed)
+                CompleteProfileView()
                     .transition(.move(edge: .bottom).combined(with: .opacity))
-            }
-        }
-        .onChange(of: isMiddlePressed) {
-            if isMiddlePressed {
-                Task {
-                    try await databaseManager.checkIfUserExistInDatabase()
-                }
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)

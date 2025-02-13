@@ -17,22 +17,26 @@ struct ProfileView: View {
     // MARK: - BODY
     var body: some View {
         ZStack(alignment: .top) {
-            profileHeader
+            
             ScrollView {
                 if let profileSaved = UserDefaults.standard.userSaved {
                     LazyVStack(alignment: .leading,spacing: 20) {
                         
-                        rowView(name: "person.fill", text: "NAME".localized, udText: profileSaved.name)
+                        rowView(name: "person.fill", text: "NAME".localized, udText: "\(profileSaved.name) \(profileSaved.surname)")
                         rowView(name: "envelope.fill", text: "LOGIN_EMAIL".localized, udText: profileSaved.email)
-                        rowView(name: "person.text.rectangle.fill", text: "DNI_NIE".localized, udText: profileSaved.dni)
                         
                         rowView(name: "map.fill", text: "LOCALITY".localized, udText: "\(profileSaved.locality), \(profileSaved.province)")
                     }
                     .padding(.horizontal, Measures.kHomeHorizontalPadding)
+                    .safeAreaInset(edge: .top) {
+                        EmptyView()
+                            .frame(height: Measures.kTopShapeHeightSmaller - 10)
+                    }
                 }
             }
             .padding(.bottom, Measures.kTabBarHeight + 40)
-            .padding(.top, Measures.kTopShapeHeightSmaller)
+            .safeAreaTopPadding(proxy: proxy)
+            profileHeader
         }
         .overlay(alignment: .bottom) {
             logoutButton
@@ -41,11 +45,6 @@ struct ProfileView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(ColorManager.bgColor)
-        .onAppear {
-            Task {
-                try await databaseManager.checkIfUserExistInDatabase()
-            }
-        }
     }
 }
 
@@ -59,7 +58,7 @@ extension ProfileView {
             Text("PROFILE_HEADER".localized)
                 .font(.custom(CustomFonts.bold, size: 30))
                 .foregroundStyle(ColorManager.defaultWhite)
-                .padding(.horizontal, Measures.kHomeHorizontalPadding)
+                .padding(.horizontal, Measures.kHomeHorizontalPadding)            
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -99,7 +98,6 @@ extension ProfileView {
             Task {
                 try authenticatorManager.signOut()
             }
-            
         } label: {
             HStack {
                 Image(systemName: "door.left.hand.open")
@@ -115,10 +113,6 @@ extension ProfileView {
                     .stroke(lineWidth: 1)
                     .foregroundStyle(ColorManager.cancelColor)
             }
-            .background {
-                RoundedRectangle(cornerRadius: 10)
-                    .foregroundStyle(ColorManager.bgColor)
-            }
         }
     }
 }
@@ -133,7 +127,7 @@ struct ProfileView_Previews: PreviewProvider {
             FSCategory(id: "3", name: "Clases online", is_manual: false),
         ]
         
-        UserDefaults.standard.userSaved = User(id: "1", name: "Juan", email: "juan@Gmail.com", dni: "877282", community: "Madrid", province: "Madrid", locality: "Toledo")
+        UserDefaults.standard.userSaved = User(id: "1", name: "Juan", email: "juan@Gmail.com", surname: "Fernandez Lopez", community: "Madrid", province: "Madrid", locality: "Toledo")
         return GeometryReader { proxy in
             ProfileView(proxy: proxy)
                 .environment(AuthenticatorManager())

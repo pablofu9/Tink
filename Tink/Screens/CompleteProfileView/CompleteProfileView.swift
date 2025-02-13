@@ -12,7 +12,7 @@ struct CompleteProfileView: View {
     // MARK: - Focus state enum
     enum CoompleteProfileFocused {
         case name
-        case dni
+        case surname
     }
     
     // MARK: - BLOB PROPERTIES
@@ -30,28 +30,51 @@ struct CompleteProfileView: View {
     @State var provinceSelected: Province?
     @State var selectedTown: Town?
     @State private var name: String = ""
-    @State private var DNI: String = ""
+    @State private var surname: String = ""
 
     // MARK: - DATABASE MANAGER
     @EnvironmentObject var databaseManager: FSDatabaseManager
 
-    // MARK: - CHECK IF IS MIDDLE
-    @Binding var isMiddlePressed: Bool
     
     // MARK: - BODY
     var body: some View {
-        GeometryReader { proxy in
-            blobBG(proxy)
-            ScrollView {
-                LazyVStack(spacing: 20) {
-                    nameView
-                    dniView
-                    communitySelector
-                    provinceTownsSelector
+        content
+            .overlay {
+                if provincesHelper.loading {
+                    LoadingView()
                 }
             }
+    }
+}
+
+
+// MARK: - SUBVIEWS
+extension CompleteProfileView {
+    
+    @ViewBuilder
+    private var content: some View {
+        GeometryReader { proxy in
+            ScrollView {
+                LazyVStack(alignment: .leading,spacing: 20, pinnedViews: .sectionHeaders) {
+                    Section {
+                        nameView
+                        surnameView
+                        communitySelector
+                        provinceTownsSelector
+                    } header: {
+                        VStack(alignment: .leading) {
+                            Text("COMPLETE_PROFILE".localized)
+                                .font(.custom(CustomFonts.bold, size: 27))
+                                .foregroundStyle(ColorManager.primaryGrayColor)
+                            Text("NEED_COMPLETE_PROFILE".localized)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .background(ColorManager.defaultWhite)
+                    }
+                }
+            }
+            .ignoresSafeArea()
             .safeAreaVerticalPadding(proxy: proxy)
-            .padding(.top, 100)
             .padding(.horizontal, Measures.kHomeHorizontalPadding - 3)
             .scrollIndicators(.hidden)
             .onAppear {
@@ -61,6 +84,7 @@ struct CompleteProfileView: View {
                 }
                 startRandomMovement()
             }
+            blobBG(proxy)
         }
         .background(ColorManager.defaultWhite)
         .overlay(alignment: .bottom) {
@@ -71,35 +95,29 @@ struct CompleteProfileView: View {
         .onTapGesture {
             focus = nil
         }
-        .ignoresSafeArea()
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
-}
-
-
-// MARK: - SUBVIEWS
-extension CompleteProfileView {
     
     @ViewBuilder
     private func blobBG(_ proxy: GeometryProxy) -> some View {
         ZStack(alignment: .topLeading) {
-           
+            
             CustomBlob()
                 .frame(width: proxy.size.width / 3, height: proxy.size.width / 3)
-                .foregroundStyle(ColorManager.primaryBasicColor.opacity(0.5))
+                .foregroundStyle(ColorManager.primaryBasicColor.opacity(0.3))
                 .position(position1)
             
             // Segundo blob
             CustomBlob()
                 .frame(width: proxy.size.width / 3, height: proxy.size.width / 3)
-                .foregroundStyle(ColorManager.primaryBasicColor.opacity(0.6))
+                .foregroundStyle(ColorManager.primaryBasicColor.opacity(0.4))
                 .rotationEffect(.degrees(180))
                 .position(position2)
             
             // Tercer blob
             CustomBlob()
                 .frame(width: proxy.size.width / 3, height: proxy.size.width / 3)
-                .foregroundStyle(ColorManager.primaryBasicColor.opacity(0.7))
+                .foregroundStyle(ColorManager.primaryBasicColor.opacity(0.5))
                 .rotationEffect(.degrees(90))
                 .position(position3)
             
@@ -108,15 +126,6 @@ extension CompleteProfileView {
                 .foregroundStyle(ColorManager.primaryBasicColor.opacity(0.4))
                 .rotationEffect(.degrees(120))
                 .position(position4)
-            HStack(spacing: 10) {
-                if isMiddlePressed {
-                    backIcon
-                }
-                Text("COMPLETE_PROFILE".localized)
-                    .font(.custom(CustomFonts.bold, size: 27))
-                    .foregroundStyle(ColorManager.primaryGrayColor)
-            }
-            .position(x: proxy.size.width / 2.5, y: 80)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
@@ -127,11 +136,11 @@ extension CompleteProfileView {
             Text("NAME".localized)
                 .foregroundStyle(ColorManager.primaryGrayColor.opacity(0.8))
                 .font(.custom(CustomFonts.regular, size: 17))
-            TextField("", text: $name)
+            TextField("", text: $name, prompt: propmtView("TYPE_NAME".localized))
                 .textFieldStyle(LoginTextField(focused: focus == .name))
                 .focused($focus, equals: .name)
                 .onSubmit {
-                    focus = .dni
+                    focus = .surname
                 }
                 .submitLabel(.continue)
         }
@@ -139,14 +148,14 @@ extension CompleteProfileView {
     }
     
     @ViewBuilder
-    private var dniView: some View {
+    private var surnameView: some View {
         VStack(alignment: .leading ,spacing: 3) {
-            Text("DNI_NIE".localized)
+            Text("SURNAME".localized)
                 .foregroundStyle(ColorManager.primaryGrayColor.opacity(0.8))
                 .font(.custom(CustomFonts.regular, size: 17))
-            TextField("", text: $DNI)
-                .textFieldStyle(LoginTextField(focused: focus == .dni))
-                .focused($focus, equals: .dni)
+            TextField("", text: $surname, prompt: propmtView("TYPE_SURNAME".localized))
+                .textFieldStyle(LoginTextField(focused: focus == .surname))
+                .focused($focus, equals: .surname)
                 .onSubmit {
                     focus = nil
                 }
@@ -157,32 +166,12 @@ extension CompleteProfileView {
     
     @ViewBuilder
     private var communitySelector: some View {
-        VStack(alignment: .leading ,spacing: 3) {
-            Text("COMMUNITY_AUT".localized)
-                .foregroundStyle(ColorManager.primaryGrayColor.opacity(0.8))
-                .font(.custom(CustomFonts.regular, size: 17))
-            Picker("", selection: $selectedCommunity) {
-                Text("SELECTE_COMUNNITY".localized)
-                    .tag(nil as AutonomousCommunity?)
-                    .foregroundStyle(ColorManager.primaryGrayColor)
-                ForEach(provincesHelper.communities, id: \.self) { community in
-                    Text(community.label)
-                        .font(.custom(CustomFonts.bold, size: 12))
-                        .foregroundStyle(ColorManager.primaryGrayColor)
-                        .tag(community)
-                }
-            }
-            .labelsHidden()
-            .accentColor(ColorManager.primaryGrayColor)
-            .pickerStyle(MenuPickerStyle())
-            .overlay {
-                RoundedRectangle(cornerRadius: 10)
-                    .stroke(lineWidth: 1)
-                    .foregroundStyle(ColorManager.primaryGrayColor)
-            }
-            .padding(.horizontal, 3)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        GenericPickerView(
+            title: "COMMUNITY_AUT".localized,
+            options: provincesHelper.communities,
+            selectedOption: $selectedCommunity
+        )
+        .padding(.horizontal, 3)
         .onChange(of: selectedCommunity) {
             withAnimation(.easeInOut(duration: 0.2)) {
                 if let selectedCommunity {
@@ -197,78 +186,32 @@ extension CompleteProfileView {
     
     @ViewBuilder
     private var provincesSelector: some View {
-        if !provincesHelper.provinces.isEmpty {
-            VStack(alignment: .leading ,spacing: 3) {
-                Text("PROVINCE".localized)
-                    .foregroundStyle(ColorManager.primaryGrayColor.opacity(0.8))
-                    .font(.custom(CustomFonts.regular, size: 17))
-                Picker("", selection: $provinceSelected) {
-                    Text("PROVINCE".localized)
-                        .tag(nil as Province?)
-                        .foregroundStyle(ColorManager.primaryGrayColor)
-                    ForEach(provincesHelper.provinces, id: \.self) { province in
-                        Text(province.label)
-                            .font(.custom(CustomFonts.bold, size: 12))
-                            .foregroundStyle(ColorManager.primaryGrayColor)
-                            .tag(province)
-                    }
-                }
-                .labelsHidden()
-                .accentColor(ColorManager.primaryGrayColor)
-                .pickerStyle(MenuPickerStyle())
-                .overlay {
-                    RoundedRectangle(cornerRadius: 10)
-                        .stroke(lineWidth: 1)
-                        .foregroundStyle(ColorManager.primaryGrayColor)
-                }
-                .padding(.leading, 3)
-            }
-            .onChange(of: provinceSelected) {
-                withAnimation(.easeInOut(duration: 0.2)) {
-                    if let provinceSelected {
-                        resetOnProvinceChange()
-                        provincesHelper.getTowns(province: provinceSelected)
-                    } else {
-                        resetOnProvinceChange()
-                    }
+        GenericPickerView(
+            title: "PROVINCE".localized,
+            options: provincesHelper.provinces,
+            selectedOption: $provinceSelected
+        )
+        .padding(.horizontal, 3)
+        .onChange(of: provinceSelected) {
+            withAnimation(.easeInOut(duration: 0.2)) {
+                if let provinceSelected {
+                    resetOnProvinceChange()
+                    provincesHelper.getTowns(province: provinceSelected)
+                } else {
+                    resetOnProvinceChange()
                 }
             }
-            .transition(.opacity)
-            .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
     
     @ViewBuilder
     private var townSelector: some View {
-        if !provincesHelper.towns.isEmpty {
-            VStack(alignment: .leading ,spacing: 3) {
-                Text("LOCALITY".localized)
-                    .foregroundStyle(ColorManager.primaryGrayColor.opacity(0.8))
-                    .font(.custom(CustomFonts.regular, size: 17))
-                Picker("", selection: $selectedTown) {
-                    Text("LOCALITY".localized)
-                        .tag(nil as Town?)
-                        .foregroundStyle(ColorManager.primaryGrayColor)
-                    ForEach(provincesHelper.towns, id: \.self) { town in
-                        Text(town.label)
-                            .font(.custom(CustomFonts.bold, size: 12))
-                            .foregroundStyle(ColorManager.primaryGrayColor)
-                            .tag(town)
-                    }
-                }
-                .labelsHidden()
-                .accentColor(ColorManager.primaryGrayColor)
-                .pickerStyle(MenuPickerStyle())
-                .overlay {
-                    RoundedRectangle(cornerRadius: 10)
-                        .stroke(lineWidth: 1)
-                        .foregroundStyle(ColorManager.primaryGrayColor)
-                }
-            }
-            .padding(.trailing, 3)
-            .transition(.opacity)
-            .frame(maxWidth: .infinity, alignment: .leading)
-        }
+        GenericPickerView(
+            title: "LOCALITY".localized,
+            options: provincesHelper.towns,
+            selectedOption: $selectedTown
+        )
+        .padding(.horizontal, 3)
     }
     
     @ViewBuilder
@@ -284,10 +227,7 @@ extension CompleteProfileView {
         Button {
             Task {
                 if let selectedCommunity, let provinceSelected, let selectedTown {
-                    try await databaseManager.createNewUser(name: name, dni: DNI, community: selectedCommunity.label, province: provinceSelected.label, locality: selectedTown.label)
-                }
-                withAnimation(.easeInOut(duration: 0.3)) {
-                    databaseManager.goCompleteProfile = false
+                    try await databaseManager.createNewUser(name: name, surname: surname, community: selectedCommunity.label, province: provinceSelected.label, locality: selectedTown.label)
                 }
             }
         } label: {
@@ -302,16 +242,13 @@ extension CompleteProfileView {
         .disabled(!isFormValid())
     }
     
-    /// Back icon
     @ViewBuilder
-    private var backIcon: some View {
-        BackButton(action: {
-            withAnimation(.easeInOut(duration: 0.2)) {
-                databaseManager.goCompleteProfile = false
-                isMiddlePressed = false
-            }
-        })
+    private func propmtView(_ text: String) -> Text {
+        Text(text)
+            .font(.custom(CustomFonts.regular, size: 17))
+            .foregroundStyle(ColorManager.primaryGrayColor.opacity(0.6))
     }
+    
 }
 
 // MARK: - PRIVATE FUNCS
@@ -363,14 +300,13 @@ extension CompleteProfileView {
         provinceSelected != nil &&
         selectedTown != nil &&
         !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
-        !DNI.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        !surname.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 }
 
 
 #Preview {
-    @Previewable @State  var isMiddle: Bool = false
-    CompleteProfileView(isMiddlePressed: $isMiddle)
+    CompleteProfileView()
         .environmentObject(FSDatabaseManager())
 }
 

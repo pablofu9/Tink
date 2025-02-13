@@ -12,7 +12,7 @@ struct User: Identifiable, Codable {
     var id: String
     var name: String
     var email: String
-    var dni: String
+    var surname: String
     var community: String
     var province: String
     var locality: String

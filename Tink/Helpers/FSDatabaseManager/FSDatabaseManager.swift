@@ -52,13 +52,13 @@ class FSDatabaseManager: ObservableObject {
             
             if snapshot.exists {
                 if let userData = snapshot.data(),
-                   let dni = userData["dni"] as? String,
+                   let surname = userData["surname"] as? String,
                    let name = userData["name"] as? String,
                    let email = userData["email"] as? String,
                    let community = userData["community"] as? String,
                    let province = userData["province"] as? String,
                    let locality = userData["locality"] as? String,
-                   !dni.isEmpty {
+                   !surname.isEmpty {
                     goCompleteProfile = false
                     
                     // Store userdefault usersaved data
@@ -67,7 +67,7 @@ class FSDatabaseManager: ObservableObject {
                             id: user.uid,
                             name: name,
                             email: email,
-                            dni: dni,
+                            surname: surname,
                             community: community,
                             province: province ,
                             locality: locality
@@ -92,7 +92,7 @@ class FSDatabaseManager: ObservableObject {
         loading = false
     }
     
-    func createNewUser(name: String, dni: String, community: String, province: String, locality: String) async throws {
+    func createNewUser(name: String, surname: String, community: String, province: String, locality: String) async throws {
         loading = true
         guard let user = Auth.auth().currentUser else {
             print("No user authenticated")
@@ -104,7 +104,7 @@ class FSDatabaseManager: ObservableObject {
             let snapshot = try await userRef.getDocument()
             let userData: [String: String] = [
                 "name": name,
-                "dni": dni,
+                "surname": surname,
                 "community": community,
                 "province": province,
                 "locality": locality
@@ -117,12 +117,15 @@ class FSDatabaseManager: ObservableObject {
                     id: user.uid,
                     name: name,
                     email: user.email ?? "",
-                    dni: dni,
+                    surname: surname,
                     community: community,
                     province: province ,
                     locality: locality
                 )
                 print("✅ Usuario actualizado en Firestore")
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    self.goCompleteProfile = false
+                }
             } else {
                 // ❌ User dont exist, we create it
                 var newUser = userData
@@ -134,12 +137,15 @@ class FSDatabaseManager: ObservableObject {
                     id: user.uid,
                     name: name,
                     email: user.email ?? "",
-                    dni: dni,
+                    surname: surname,
                     community: community,
                     province: province ,
                     locality: locality
                 )
                 print("✅ Usuario creado en Firestore")
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    self.goCompleteProfile = false
+                }
             }
         } catch {
             print("❌ Firestore error: \(error.localizedDescription)")

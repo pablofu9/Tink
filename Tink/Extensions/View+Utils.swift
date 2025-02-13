@@ -21,6 +21,15 @@ extension View {
 
 extension View {
     func safeAreaVerticalPadding(proxy: GeometryProxy) -> some View {
-        self.padding(.vertical, proxy.safeAreaInsets.top > 0 ? proxy.safeAreaInsets.top : Measures.kVerticalPaddingIfNoSafeArea)
+        self.padding(.vertical, proxy.safeAreaInsets.top > 0 ? proxy.safeAreaInsets.top :0)
+    }
+}
+
+extension View {
+    func limitText(_ text: Binding<String>, to characterLimit: Int) -> some View {
+        self
+            .onChange(of: text.wrappedValue) { 
+                text.wrappedValue = String(text.wrappedValue.prefix(characterLimit))
+            }
     }
 }

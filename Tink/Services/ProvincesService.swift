@@ -12,7 +12,6 @@ actor ProvincesService {
     func fectchProvinces() async throws -> [AutonomousCommunity] {
         @Inject var provincesRepo: ProvincesWebRepo
         return try await provincesRepo.getComunities()
-        
     }
 }
 
