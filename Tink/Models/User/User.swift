@@ -17,3 +17,7 @@ struct User: Identifiable, Codable {
     var province: String
     var locality: String
 }
+
+extension User {
+    static let sampleUser =  User(id: "1", name: "Juan", email: "Juan@gmail.com", surname: "Fernandez Lopez", community: "Madrid", province: "Madrid", locality: "Madrid")
+}

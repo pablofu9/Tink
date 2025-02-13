@@ -7,6 +7,16 @@
 
 import SwiftUI
 
+// MARK: - ENUM TO SELECT PRICE
+enum NewSkillPrice: String, CaseIterable, CustomStringConvertible {
+    case eurHour = "€/H"
+    case eur = "€"
+    
+    var description: String {
+        return self.rawValue
+    }
+}
+
 struct NewSkillView: View {
     
     // MARK: - ENUM TO CONTROL FOCUS
@@ -14,16 +24,6 @@ struct NewSkillView: View {
         case name
         case description
         case price
-    }
-    
-    // MARK: - ENUM TO SELECT PRICE
-    enum NewSkillPrice: String, CaseIterable, CustomStringConvertible {
-        case eurHour = "€/H"
-        case eur = "€"
-        
-        var description: String {
-            return self.rawValue
-        }
     }
     
     enum NewSkillOnline: String, CaseIterable, CustomStringConvertible {
@@ -276,12 +276,12 @@ extension NewSkillView {
                 }
                 
                 do {
-                    if let selectedCategory {
-                        if let isManual = selectedCategory.is_manual {
-                            try await databaseManager.createNewSkill(skillName: skillName, skillDescription: skillDescription, skillPrice: price, category: selectedCategory)
+                    if let selectedCategory, let selectedPrice {
+                        if let _ = selectedCategory.is_manual {
+                            try await databaseManager.createNewSkill(skillName: skillName, skillDescription: skillDescription, skillPrice: price, category: selectedCategory, newSkillPrince: selectedPrice)
                         } else {
                             if let isOnline = newSkillOnline {
-                                try await databaseManager.createNewSkill(skillName: skillName, skillDescription: skillDescription, skillPrice: price, category: selectedCategory, isOnline: isOnline == .online ? true : false)
+                                try await databaseManager.createNewSkill(skillName: skillName, skillDescription: skillDescription, skillPrice: price, category: selectedCategory, isOnline: isOnline == .online ? true : false, newSkillPrince: selectedPrice)
                             }
                         }
                     }

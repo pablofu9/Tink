@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D80BB4332D5E222900772C62 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = D80BB4322D5E222900772C62 /* SDWebImageSwiftUI */; };
 		D84AE8FC2D5BA0870069672D /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = D84AE8FB2D5BA0870069672D /* Lottie */; };
 		D8CDF9242D5A09C400173F00 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = D8CDF9232D5A09C400173F00 /* GoogleSignIn */; };
 		D8CDF9262D5A09C400173F00 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = D8CDF9252D5A09C400173F00 /* GoogleSignInSwift */; };
@@ -57,6 +58,7 @@
 				D84AE8FC2D5BA0870069672D /* Lottie in Frameworks */,
 				D8CDF92D2D5A0A1300173F00 /* FirebaseAuthCombine-Community in Frameworks */,
 				D8CDF92F2D5A0A1300173F00 /* FirebaseFirestore in Frameworks */,
+				D80BB4332D5E222900772C62 /* SDWebImageSwiftUI in Frameworks */,
 				D8CDF9332D5A0A1300173F00 /* FirebasePerformance in Frameworks */,
 				D8CDF9312D5A0A1300173F00 /* FirebaseFirestoreCombine-Community in Frameworks */,
 			);
@@ -111,6 +113,7 @@
 				D8CDF9322D5A0A1300173F00 /* FirebasePerformance */,
 				D8CDF9342D5A0A1300173F00 /* FirebaseStorage */,
 				D84AE8FB2D5BA0870069672D /* Lottie */,
+				D80BB4322D5E222900772C62 /* SDWebImageSwiftUI */,
 			);
 			productName = Tink;
 			productReference = D8C717632D560C9F00D2A5BF /* Tink.app */;
@@ -144,6 +147,7 @@
 				D8CDF9222D5A09C400173F00 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
 				D8CDF9272D5A0A1300173F00 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				D84AE8FA2D5BA0870069672D /* XCRemoteSwiftPackageReference "lottie-ios" */,
+				D80BB4312D5E222900772C62 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = D8C717642D560C9F00D2A5BF /* Products */;
@@ -402,6 +406,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		D80BB4312D5E222900772C62 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SDWebImage/SDWebImageSwiftUI";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.1.3;
+			};
+		};
 		D84AE8FA2D5BA0870069672D /* XCRemoteSwiftPackageReference "lottie-ios" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/airbnb/lottie-ios.git";
@@ -429,6 +441,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		D80BB4322D5E222900772C62 /* SDWebImageSwiftUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D80BB4312D5E222900772C62 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */;
+			productName = SDWebImageSwiftUI;
+		};
 		D84AE8FB2D5BA0870069672D /* Lottie */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = D84AE8FA2D5BA0870069672D /* XCRemoteSwiftPackageReference "lottie-ios" */;

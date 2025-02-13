@@ -145,7 +145,6 @@ struct CategoriesView_Previews: PreviewProvider {
             HomeView(proxy: proxy)
                 .environment(AuthenticatorManager())
                 .environmentObject(mockManager)
-                .environmentObject(FSDatabaseManager())
                 .ignoresSafeArea()
         }
         .previewLayout(.sizeThatFits)

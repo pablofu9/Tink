@@ -153,12 +153,11 @@ class FSDatabaseManager: ObservableObject {
         loading = false
     }
     
-    func createNewSkill(skillName: String, skillDescription: String, skillPrice: String, category: FSCategory, isOnline: Bool? = nil) async throws {
+    func createNewSkill(skillName: String, skillDescription: String, skillPrice: String, category: FSCategory, isOnline: Bool? = nil, newSkillPrince: NewSkillPrice) async throws {
         
         // 0. Control loading state
         loading = true
         
-        // Asegurarte de cambiar loading a false cuando el método termine (sin importar el resultado)
         defer {
             loading = false
         }
@@ -177,7 +176,7 @@ class FSDatabaseManager: ObservableObject {
             id: "",
             name: skillName,
             description: skillDescription,
-            price: skillPrice,
+            price: "\(skillPrice) \(newSkillPrince.description)",
             category: category,
             user: user,
             is_online: isOnline
@@ -188,13 +187,16 @@ class FSDatabaseManager: ObservableObject {
         let skillRef = db.collection("skills").document()
         
         do {
-            // 3. Save new skill in firestore
-            try skillRef.setData(from: newSkill)
-            
-            // 4. Obtain new id for firestore
             newSkill.id = skillRef.documentID
-            
-            print("✅ New skill added to Firestore with ID: \(newSkill.id)")
+            try skillRef.setData(from: newSkill) { error in
+                if let error = error {
+                    print("Error saving skill: \(error.localizedDescription)")
+                } else {
+                    
+                    UserDefaults.standard.skillsSaved.append(newSkill)
+                    print("✅ New skill added to Firestore with ID: \(newSkill.id)")
+                }
+            }
         } catch {
             throw NSError(domain: "FirestoreError", code: 500, userInfo: [NSLocalizedDescriptionKey: "Error adding skill to Firestore: \(error.localizedDescription)"])
         }
