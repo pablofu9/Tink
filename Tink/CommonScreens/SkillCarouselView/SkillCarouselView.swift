@@ -44,7 +44,7 @@ struct SkillCarouselView: View {
             }
             .animation(.easeInOut(duration: 0.3), value: selectedIndex) // Animación con duración
         }
-        .frame(height: 280)
+        .frame(height: 320)
     }
 }
 

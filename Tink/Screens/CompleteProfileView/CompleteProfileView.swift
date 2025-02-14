@@ -61,6 +61,9 @@ extension CompleteProfileView {
                         surnameView
                         communitySelector
                         provinceTownsSelector
+                        Spacer()
+                        continueButton
+                            .padding(.bottom, 60)
                     } header: {
                         VStack(alignment: .leading) {
                             Text("COMPLETE_PROFILE".localized)
@@ -87,11 +90,6 @@ extension CompleteProfileView {
             blobBG(proxy)
         }
         .background(ColorManager.defaultWhite)
-        .overlay(alignment: .bottom) {
-            continueButton
-                .padding(.bottom, 70)
-                .padding(.horizontal, Measures.kHomeHorizontalPadding)
-        }
         .onTapGesture {
             focus = nil
         }

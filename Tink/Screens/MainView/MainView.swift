@@ -28,6 +28,7 @@ struct MainView: View {
             .onAppear {
                 Task {
                     try await databaseManager.checkIfUserExistInDatabase()
+                    try await databaseManager.syncSkills()
                 }
             }
             .fullScreenCover(isPresented: $isMiddlePressed) {

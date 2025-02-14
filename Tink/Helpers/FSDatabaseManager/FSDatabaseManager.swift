@@ -21,21 +21,23 @@ class FSDatabaseManager: ObservableObject {
     @Published var goCompleteProfile = false
     
     func fetchCategories() async {
-        categories = []
-        let db = Firestore.firestore()
-        let query = db.collection("categories")
-        loading = true
-        // Delay to pretend loading
-       // try? await Task.sleep(nanoseconds: 5_000_000_000)
-        do {
-            let snapshot = try await query.getDocuments()
-            self.categories = snapshot.documents.compactMap { document in
-                try? document.data(as: FSCategory.self)
+        if self.categories.isEmpty {
+            loading = true
+            defer { loading = false }
+            let db = Firestore.firestore()
+            let query = db.collection("categories")
+            loading = true
+            // Delay to pretend loading
+            // try? await Task.sleep(nanoseconds: 5_000_000_000)
+            do {
+                let snapshot = try await query.getDocuments()
+                self.categories = snapshot.documents.compactMap { document in
+                    try? document.data(as: FSCategory.self)
+                }
+            } catch {
+                print("Error al obtener categorías: \(error.localizedDescription)")
             }
-        } catch {
-            print("Error al obtener categorías: \(error.localizedDescription)")
         }
-        loading = false
     }
     
     func checkIfUserExistInDatabase() async throws {
@@ -153,6 +155,7 @@ class FSDatabaseManager: ObservableObject {
         loading = false
     }
     
+    /// Function to create new skills
     func createNewSkill(skillName: String, skillDescription: String, skillPrice: String, category: FSCategory, isOnline: Bool? = nil, newSkillPrince: NewSkillPrice) async throws {
         
         // 0. Control loading state
@@ -199,6 +202,99 @@ class FSDatabaseManager: ObservableObject {
             }
         } catch {
             throw NSError(domain: "FirestoreError", code: 500, userInfo: [NSLocalizedDescriptionKey: "Error adding skill to Firestore: \(error.localizedDescription)"])
+        }
+    }
+    
+    /// Function to sync skills
+    func syncSkills() async throws {
+        loading = true
+        defer { loading = false }
+        guard let userSaved = UserDefaults.standard.userSaved else {
+             print("No hay usuario guardado")
+             return
+         }
+            UserDefaults.standard.skillsSaved = []
+            let db = Firestore.firestore()
+            let query = db.collection("skills")
+            do {
+                let snapshot = try await query.getDocuments()
+                let skills = snapshot.documents.compactMap { document in
+                    let skill = try? document.data(as: Skill.self)
+                    return skill?.user.id == userSaved.id ? skill : nil
+                }
+                UserDefaults.standard.skillsSaved = skills
+                print("✅ Correctly sync skills")
+            } catch {
+                print("Erorr loading categories", error)
+            }
+    }
+    
+    /// Update Skill
+    func updateSkill(skill: Skill) async throws {
+        loading = true
+        defer {
+            loading = false
+        }
+        
+        // 1. No user auth
+        guard let _ = UserDefaults.standard.userSaved else {
+            return
+        }
+        
+        // 2. Reference to skill document based on ID
+        let db = Firestore.firestore()
+        let skillRef = db.collection("skills").document(skill.id)
+        
+        do {
+            // 🔹 Codificar el objeto Skill en un diccionario seguro
+            let encodedSkill = try Firestore.Encoder().encode(skill)
+            print(skill)
+            // 🔹 Actualizar Firestore con el objeto completo
+            try await skillRef.setData(encodedSkill, merge: true)
+
+            // 3. Actualizar localmente en UserDefaults (en hilo principal)
+            if let index = UserDefaults.standard.skillsSaved.firstIndex(where: { $0.id == skill.id }) {
+                UserDefaults.standard.skillsSaved[index] = skill
+            }
+
+            print("✅ Skill updated in Firestore: \(skill.id)")
+        } catch {
+            throw NSError(domain: "FirestoreError", code: 500, userInfo: [
+                NSLocalizedDescriptionKey: "Error updating skill in Firestore: \(error.localizedDescription)"
+            ])
+        }
+    }
+    
+    /// Delete skill func
+    func deleteSkill(skill: Skill) async throws {
+        // 1. Manage loading
+        loading = true
+        defer {
+            loading = false
+        }
+        
+        guard let _ = UserDefaults.standard.userSaved else {
+            return
+        }
+        
+        // 2. Retreive selected skill document
+        let db = Firestore.firestore()
+        let skillRef = db.collection("skills").document(skill.id)
+        
+        do {
+            // 🔹 Eliminar el documento de Firestore
+            try await skillRef.delete()
+            
+            // 3. Eliminar localmente en UserDefaults (en hilo principal)
+            if let index = UserDefaults.standard.skillsSaved.firstIndex(where: { $0.id == skill.id }) {
+                UserDefaults.standard.skillsSaved.remove(at: index)
+            }
+            
+            print("🗑️ Skill deleted from Firestore: \(skill.id)")
+        } catch {
+            throw NSError(domain: "FirestoreError", code: 500, userInfo: [
+                NSLocalizedDescriptionKey: "Error deleting skill in Firestore: \(error.localizedDescription)"
+            ])
         }
     }
 }

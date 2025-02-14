@@ -17,6 +17,7 @@ struct SkillCardView: View {
         GeometryReader { proxy in
             ZStack(alignment: .bottom) {
                 imageView
+                offsetCapsule
                 VStack(alignment: .leading ,spacing: 2) {
                     HStack {
                         Text(skill.name)
@@ -30,27 +31,29 @@ struct SkillCardView: View {
                     Text(skill.description)
                         .font(.custom(CustomFonts.regular, size: 15))
                         .foregroundStyle(ColorManager.defaultWhite)
+                        .multilineTextAlignment(.leading)
                         .lineLimit(3)
                     Spacer()
-                    HStack(spacing: 7) {
-                        capsuleView(skill.price)
-                        capsuleView(skill.category.name)
-                        if let categoryOnline = skill.category.is_manual {
-                            capsuleView(!categoryOnline ? "NEW_SKILL_ONLINE".localized : "NEW_SKILL_PRESENCIAL".localized)
-                        } else  if let is_online = skill.is_online {
-                            capsuleView(is_online ? "NEW_SKILL_ONLINE".localized : "NEW_SKILL_PRESENCIAL".localized)
+                    VStack(alignment: .leading) {
+                        HStack(spacing: 7) {
+                            capsuleView(skill.price)
+                            if let categoryOnline = skill.category.is_manual {
+                                capsuleView(!categoryOnline ? "NEW_SKILL_ONLINE".localized : "NEW_SKILL_PRESENCIAL".localized)
+                            } else  if let is_online = skill.is_online {
+                                capsuleView(is_online ? "NEW_SKILL_ONLINE".localized : "NEW_SKILL_PRESENCIAL".localized)
+                            }
                         }
                     }
                 }
                 .padding(.vertical, 10)
                 .padding(.horizontal, 10)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .frame(height: proxy.size.height / 2, alignment: .top)
-                .background(ColorManager.primaryGrayColor.opacity(0.7))
+                .frame(height: proxy.size.height / 1.7, alignment: .top)
+                .background(ColorManager.primaryGrayColor.opacity(0.8))
                 .cornerRadius(10)
             }
         }
-        .frame(width: UIScreen.main.bounds.width - 26, height: 250)
+        .frame(width: UIScreen.main.bounds.width - 26, height: 280)
     }
     
 }
@@ -58,20 +61,35 @@ struct SkillCardView: View {
 // MARK: - SUBVIEWS
 extension SkillCardView {
     
+    /// Top capsule view
+    @ViewBuilder
+    private var offsetCapsule: some View {
+        VStack(alignment: .trailing) {
+            capsuleView(skill.category.name)
+                .shadow(color: ColorManager.primaryGrayColor.opacity(0.3), radius: 2, y: -2)
+            Spacer()
+        }
+        .padding(.trailing, 10)
+        .frame(maxWidth: .infinity, alignment: .trailing)
+        .offset(y: -10)
+    }
+    
+    /// Image view
     @ViewBuilder
     private var imageView: some View {
         if let imageUrl = skill.category.image_url {
             WebImage(url: URL(string: imageUrl))
                 .resizable()
                 .aspectRatio(contentMode: .fill)
-                .frame(width: UIScreen.main.bounds.width - 26, height: 250)
+                .frame(width: UIScreen.main.bounds.width - 26, height: 280)
                 .cornerRadius(10)
         } else {
             ColorManager.defaultWhite
-                .frame(width:  UIScreen.main.bounds.width - 26, height: 250)
+                .frame(width:  UIScreen.main.bounds.width - 26, height: 280)
         }
     }
     
+    /// Capsule view
     @ViewBuilder
     private func capsuleView(_ text: String) -> some View {
         Text(text)

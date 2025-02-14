@@ -20,6 +20,8 @@ struct ProfileView: View {
     // MARK: - TOGGLE VIEW
     @State var toggleView: Bool = false
     
+    // MARK: - CONTROL MODIFY SKILL
+    @State var selectedSkillToModify: Skill?
     
     // MARK: - BODY
     var body: some View {
@@ -47,6 +49,11 @@ struct ProfileView: View {
                 }
             }
             .coordinateSpace(name: "SCROLL")
+        }
+        .sheet(item: $selectedSkillToModify) { skill in
+            if selectedSkillToModify != nil {
+                NewSkillView(isMiddlePressed: .constant(false), skill: skill)
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(ColorManager.bgColor)
@@ -146,11 +153,14 @@ extension ProfileView {
             }
             if !filteredSkills.isEmpty {
                 VStack(alignment: .leading, spacing: 5) {
-                    Text("PROFILE_YOUR_SKILLS".localized)
-                        .font(.custom(CustomFonts.bold, size: 25))
+                    Text("PROFILE_YOUR_SKILLS".localized)                        .font(.custom(CustomFonts.bold, size: 25))
                         .foregroundStyle(ColorManager.primaryGrayColor)
                         .padding(.horizontal, Measures.kHomeHorizontalPadding)
-                    SkillCarouselView(skills: filteredSkills, selectedIndex: $currentIndex)
+                    Button {
+                        selectedSkillToModify = filteredSkills[currentIndex]
+                    } label: {
+                        SkillCarouselView(skills: filteredSkills, selectedIndex: $currentIndex)
+                    }
                 }
             }
         }

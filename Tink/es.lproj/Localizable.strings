@@ -119,6 +119,11 @@
 "NEW_SKILL_PRESENCIAL"                          = "Presencial";
 "NEW_SKILL_WHERE_OFFER"                         = "¿Donde ofreces el servicio?";
 "NEW_SKILL_CREATE_ANNOUNCE"                     = "Crear anuncio";
+"MODIFY_SKILL_HEADER"                           = "Modifica tu anuncio";
+"MODIFY_ANNOUNCE_BUTTON"                        = "Modificar anuncio";
+"MODIFY_DELETE_SKILL"                           = "Eliminar";
+"ALERT_DELETE_HEADER"                           = "Eliminar anuncio";
+"ALERT_DELETE_BODY"                             = "¿Estás seguro de que deseas eliminar el anuncio?";
 
 
 /*************************************/

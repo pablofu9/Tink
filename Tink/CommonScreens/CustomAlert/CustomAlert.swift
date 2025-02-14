@@ -14,8 +14,6 @@ struct CustomAlert: View {
     let bodyText: String
     let acceptAction: () -> Void
     let cancelAction: (() -> Void)?
-
-    @Environment(AuthenticatorManager.self) private var authenticatorManager
     
     // MARK: - BODY
     var body: some View {
@@ -64,7 +62,7 @@ extension CustomAlert {
             } label: {
                 ZStack {
                     RoundedRectangle(cornerRadius: 5)
-                        .foregroundStyle(ColorManager.cancelColor)
+                        .foregroundStyle(ColorManager.primaryBasicColor)
                     Text("ACCEPT".localized)
                         .font(.custom(CustomFonts.regular, size: 18))
                         .foregroundStyle(ColorManager.defaultWhite)
@@ -77,7 +75,7 @@ extension CustomAlert {
                 } label: {
                     ZStack {
                         RoundedRectangle(cornerRadius: 5)
-                            .foregroundStyle(ColorManager.primaryGrayColor)
+                            .foregroundStyle(ColorManager.primaryGrayColor.opacity(0.7))
                         Text("GOBACK".localized)
                             .font(.custom(CustomFonts.regular, size: 18))
                             .foregroundStyle(ColorManager.defaultWhite)
@@ -111,5 +109,4 @@ extension CustomAlert {
 
 #Preview {
     CustomAlert(title: "Cerrar sesión", bodyText: "Estas seguro de que quieres cerrar la sesión", acceptAction: {}, cancelAction: {})
-        .environment(AuthenticatorManager())
 }
