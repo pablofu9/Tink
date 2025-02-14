@@ -11,8 +11,8 @@ import SDWebImageSwiftUI
 struct SkillCardView: View {
     
     var skill: Skill
-    @State var isAnimating: Bool = true
 
+    // MARK: - BODY
     var body: some View {
         GeometryReader { proxy in
             ZStack(alignment: .bottom) {
@@ -42,6 +42,7 @@ struct SkillCardView: View {
                             } else  if let is_online = skill.is_online {
                                 capsuleView(is_online ? "NEW_SKILL_ONLINE".localized : "NEW_SKILL_PRESENCIAL".localized)
                             }
+                            
                         }
                     }
                 }

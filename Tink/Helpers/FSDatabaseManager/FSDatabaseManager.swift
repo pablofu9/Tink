@@ -12,6 +12,7 @@ import FirebaseAuth
 import AuthenticationServices
 import CryptoKit
 import FirebaseFirestore
+import Combine
 
 @MainActor
 class FSDatabaseManager: ObservableObject {
@@ -19,6 +20,10 @@ class FSDatabaseManager: ObservableObject {
     @Published var categories: [FSCategory] = []
     @Published var loading: Bool = false
     @Published var goCompleteProfile = false
+    @Published var skillsSaved: [Skill] = []
+   
+    // MARK: - CAROUSEL CONTROLLER
+    @Published var currentIndex: Int = 0
     
     func fetchCategories() async {
         if self.categories.isEmpty {
@@ -196,10 +201,11 @@ class FSDatabaseManager: ObservableObject {
                     print("Error saving skill: \(error.localizedDescription)")
                 } else {
                     
-                    UserDefaults.standard.skillsSaved.append(newSkill)
+                    self.skillsSaved.append(newSkill)
                     print("✅ New skill added to Firestore with ID: \(newSkill.id)")
                 }
             }
+            currentIndex = 0
         } catch {
             throw NSError(domain: "FirestoreError", code: 500, userInfo: [NSLocalizedDescriptionKey: "Error adding skill to Firestore: \(error.localizedDescription)"])
         }
@@ -213,7 +219,7 @@ class FSDatabaseManager: ObservableObject {
              print("No hay usuario guardado")
              return
          }
-            UserDefaults.standard.skillsSaved = []
+            self.skillsSaved = []
             let db = Firestore.firestore()
             let query = db.collection("skills")
             do {
@@ -222,7 +228,7 @@ class FSDatabaseManager: ObservableObject {
                     let skill = try? document.data(as: Skill.self)
                     return skill?.user.id == userSaved.id ? skill : nil
                 }
-                UserDefaults.standard.skillsSaved = skills
+                self.skillsSaved = skills
                 print("✅ Correctly sync skills")
             } catch {
                 print("Erorr loading categories", error)
@@ -253,10 +259,11 @@ class FSDatabaseManager: ObservableObject {
             try await skillRef.setData(encodedSkill, merge: true)
 
             // 3. Actualizar localmente en UserDefaults (en hilo principal)
-            if let index = UserDefaults.standard.skillsSaved.firstIndex(where: { $0.id == skill.id }) {
-                UserDefaults.standard.skillsSaved[index] = skill
+            if let index = self.skillsSaved.firstIndex(where: { $0.id == skill.id }) {
+                self.skillsSaved.remove(at: index)
             }
-
+            skillsSaved.append(skill)
+            currentIndex = 0
             print("✅ Skill updated in Firestore: \(skill.id)")
         } catch {
             throw NSError(domain: "FirestoreError", code: 500, userInfo: [
@@ -286,10 +293,10 @@ class FSDatabaseManager: ObservableObject {
             try await skillRef.delete()
             
             // 3. Eliminar localmente en UserDefaults (en hilo principal)
-            if let index = UserDefaults.standard.skillsSaved.firstIndex(where: { $0.id == skill.id }) {
-                UserDefaults.standard.skillsSaved.remove(at: index)
+            if let index = self.skillsSaved.firstIndex(where: { $0.id == skill.id }) {
+                self.skillsSaved.remove(at: index)
             }
-            
+            currentIndex = 0
             print("🗑️ Skill deleted from Firestore: \(skill.id)")
         } catch {
             throw NSError(domain: "FirestoreError", code: 500, userInfo: [

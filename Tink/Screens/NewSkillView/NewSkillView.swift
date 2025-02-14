@@ -473,6 +473,7 @@ extension NewSkillView {
                 if var skill, let selectedCategory, let selectedPrice {
                     skill.name = skillName
                     skill.category = selectedCategory
+                    skill.description = skillDescription
                     skill.price = "\(price) \(selectedPrice.description)"
                     if selectedCategory.is_manual == nil {
                         if newSkillOnline == .online {

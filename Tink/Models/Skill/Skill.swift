@@ -7,14 +7,18 @@
 
 import Foundation
 
-struct Skill: Codable, Identifiable {
-    var id: String 
+struct Skill: Codable, Identifiable, Equatable {
+    var id: String
     var name: String
     var description: String
     var price: String
     var category: FSCategory
     var user: User
     var is_online: Bool?
+    
+    static func == (lhs: Skill, rhs: Skill) -> Bool {
+           return lhs.id == rhs.id 
+       }
 }
 
 extension Skill {

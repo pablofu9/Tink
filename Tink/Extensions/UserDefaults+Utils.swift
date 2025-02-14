@@ -117,19 +117,3 @@ extension UserDefaults {
         }
     }
 }
-
-extension UserDefaults {
-    struct UserDefaultsSkillsSaved {
-        static let kSkillsSaved = "skillsSaved"
-    }
-        var skillsSaved: [Skill] {
-            get {
-                return get(objectType: [Skill].self, forKey: UserDefaultsSkillsSaved.kSkillsSaved) ?? []
-            }
-            set {
-                set(object: newValue, forKey: UserDefaultsSkillsSaved.kSkillsSaved)
-                synchronize()
-            }
-        }
-    
-}

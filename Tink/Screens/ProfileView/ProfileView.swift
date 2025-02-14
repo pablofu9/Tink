@@ -14,8 +14,7 @@ struct ProfileView: View {
     @Environment(AuthenticatorManager.self) private var authenticatorManager
     @EnvironmentObject var databaseManager: FSDatabaseManager
     
-    // MARK: - CAROUSEL CONTROLLER
-    @State private var currentIndex: Int = 0
+   
     
     // MARK: - TOGGLE VIEW
     @State var toggleView: Bool = false
@@ -50,7 +49,10 @@ struct ProfileView: View {
             }
             .coordinateSpace(name: "SCROLL")
         }
-        .sheet(item: $selectedSkillToModify) { skill in
+        .sheet(item: $selectedSkillToModify, onDismiss: {
+            // Aquí también puedes realizar acciones cuando el `sheet` se cierra.
+            print("Sheet dismissed")
+        }) { skill in
             if selectedSkillToModify != nil {
                 NewSkillView(isMiddlePressed: .constant(false), skill: skill)
             }
@@ -147,19 +149,23 @@ extension ProfileView {
     /// Skills view
     @ViewBuilder
     private var skillsView: some View {
-        if !UserDefaults.standard.skillsSaved.isEmpty {
-            let filteredSkills = UserDefaults.standard.skillsSaved.filter { skill in
+        if !databaseManager.skillsSaved.isEmpty {
+            let filteredSkills = databaseManager.skillsSaved.filter { skill in
                 return skill.user.id == UserDefaults.standard.userSaved?.id
             }
+            
             if !filteredSkills.isEmpty {
                 VStack(alignment: .leading, spacing: 5) {
-                    Text("PROFILE_YOUR_SKILLS".localized)                        .font(.custom(CustomFonts.bold, size: 25))
+                    Text("PROFILE_YOUR_SKILLS".localized)
+                        .font(.custom(CustomFonts.bold, size: 25))
                         .foregroundStyle(ColorManager.primaryGrayColor)
                         .padding(.horizontal, Measures.kHomeHorizontalPadding)
                     Button {
-                        selectedSkillToModify = filteredSkills[currentIndex]
+                        if databaseManager.currentIndex <= filteredSkills.count {
+                            selectedSkillToModify = filteredSkills[databaseManager.currentIndex]
+                        }
                     } label: {
-                        SkillCarouselView(skills: filteredSkills, selectedIndex: $currentIndex)
+                        SkillCarouselView(skills: filteredSkills, selectedIndex: $databaseManager.currentIndex)
                     }
                 }
             }
@@ -187,7 +193,6 @@ struct ProfileView_Previews: PreviewProvider {
     static var previews: some View {
         let mockManager = FSDatabaseManager()
         UserDefaults.standard.userSaved = User.sampleUser
-        UserDefaults.standard.skillsSaved = Skill.sampleArray
         return GeometryReader { proxy in
             ProfileView(proxy: proxy)
                 .environment(AuthenticatorManager())
