@@ -23,6 +23,8 @@ struct SkillCardView: View {
                         Text(skill.name)
                             .font(.custom(CustomFonts.semiBold, size: 19))
                             .foregroundStyle(ColorManager.defaultWhite)
+                            .lineLimit(1)
+                            .multilineTextAlignment(.leading)
                         Spacer()
                         Text(skill.user.name)
                             .font(.custom(CustomFonts.light, size: 17))

@@ -9,17 +9,17 @@ import SwiftUI
 
 struct SkillCarouselView: View {
     
-    var skills: [Skill]
     @Binding var selectedIndex: Int
-    
+    @EnvironmentObject var databaseManager: FSDatabaseManager
+
     var body: some View {
         VStack(spacing: 0) {
             // Carrusel con paginación
             TabView(selection: $selectedIndex) {
-                ForEach(skills.indices, id: \.self) { index in
-                    SkillCardView(skill: skills[index])
+                ForEach(databaseManager.filteredSkills.indices, id: \.self) { index in
+                    SkillCardView(skill: databaseManager.filteredSkills[index])
                         .tag(index)
-                        .id(skills[index].id) 
+                        .id(databaseManager.filteredSkills[index].id)
                        
                 }
             }
@@ -28,7 +28,7 @@ struct SkillCarouselView: View {
             
             // Index pagination
             HStack {
-                ForEach(0..<skills.count, id: \.self) { index in
+                ForEach(0..<databaseManager.filteredSkills.count, id: \.self) { index in
                     if selectedIndex == index {
                         Capsule()
                             .frame(width: 20, height: 8)
@@ -51,5 +51,8 @@ struct SkillCarouselView: View {
 
 #Preview {
     @Previewable @State var selectedIndex = 0
-    SkillCarouselView(skills: Skill.sampleArray, selectedIndex: $selectedIndex)
+    let mockManager = FSDatabaseManager()
+
+    SkillCarouselView(selectedIndex: $selectedIndex)
+        .environmentObject(mockManager)
 }

@@ -28,11 +28,15 @@ struct MainView: View {
             .onAppear {
                 Task {
                     try await databaseManager.checkIfUserExistInDatabase()
-                    try await databaseManager.syncSkills()
                 }
             }
             .fullScreenCover(isPresented: $isMiddlePressed) {
                 NewSkillView(isMiddlePressed: $isMiddlePressed)
+            }
+            .overlay {
+                if databaseManager.loading {
+                    LoadingView()
+                }
             }
     }
 }
@@ -67,11 +71,6 @@ extension MainView {
                 .frame(maxHeight: .infinity, alignment: .bottom)
             })
             .ignoresSafeArea()
-        }
-        .overlay {
-            if databaseManager.loading {
-                LoadingView()
-            }
         }
         .overlay {
             if databaseManager.goCompleteProfile {

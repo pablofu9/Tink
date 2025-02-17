@@ -23,19 +23,20 @@ class FSDatabaseManager: ObservableObject {
     var goCompleteProfile = false
     var skillsSaved: [Skill] = []
     var allSkillsSaved: [Skill] = []
+    
+    var filteredSkills: [Skill] {
+        let userId = UserDefaults.standard.userSaved?.id
+        return skillsSaved.filter { $0.user.id == userId }
+    }
    
     // MARK: - CAROUSEL CONTROLLER
      var currentIndex: Int = 0
     
     func fetchCategories() async {
+        loading = true
         if self.categories.isEmpty {
-            loading = true
-            defer { loading = false }
             let db = Firestore.firestore()
             let query = db.collection("categories")
-            loading = true
-            // Delay to pretend loading
-            // try? await Task.sleep(nanoseconds: 5_000_000_000)
             do {
                 let snapshot = try await query.getDocuments()
                 self.categories = snapshot.documents.compactMap { document in
@@ -270,6 +271,11 @@ class FSDatabaseManager: ObservableObject {
             if let index = self.skillsSaved.firstIndex(where: { $0.id == skill.id }) {
                 self.skillsSaved[index] = skill
             }
+            
+            if let allIndex = self.allSkillsSaved.firstIndex(where: { $0.id == skill.id}) {
+                self.allSkillsSaved[allIndex] = skill
+            }
+                
             currentIndex = 0
             print("✅ Skill updated in Firestore: \(skill.id)")
         } catch {

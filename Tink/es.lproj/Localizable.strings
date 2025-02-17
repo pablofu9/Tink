@@ -32,6 +32,8 @@
 "TYPE_SURNAME"                                  = "Escribe tus apellidos aqui";
 "NEED_COMPLETE_PROFILE"                         = "Tienes que completar tu perfíl para empezar a crear anuncios";
 "CANCEL"                                        = "Cancelar";
+"CATEGORIES"                                    = "Categorías";
+"PRESENTIALITTY"                                = "Presencialidad";
 
 /*************************************/
 // MARK: - LOGIN VIEW

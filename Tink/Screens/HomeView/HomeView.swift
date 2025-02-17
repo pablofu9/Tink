@@ -9,6 +9,21 @@ import SwiftUI
 
 struct HomeView: View {
     
+    // Filter deploey controller
+    enum FilterDeploy: CaseIterable {
+        case categories
+        case online
+        
+        var description: String {
+            switch self {
+            case .categories:
+                return "CATEGORIES".localized
+            case .online:
+                return "PRESENTIALITTY".localized
+            }
+        }
+    }
+    
     // MARK: - PROPERTIES
     // Database manager
     @EnvironmentObject var databaseManager: FSDatabaseManager
@@ -26,20 +41,29 @@ struct HomeView: View {
     @State private var focusAnimation: Bool = false
     // Online Filter
     @State private var onlineState: HomeOnlineState = .all
+    // Filter deploye controller
+    @State private var filterDeploy: FilterDeploy?
+    let columns = [
+           GridItem(.flexible(), spacing: 10),
+           GridItem(.flexible(), spacing: 10) 
+       ]
+    
     // MARK: - BODY
     var body: some View {
-        ZStack {
+        ZStack(alignment: .top) {
             ScrollView {
-                LazyVStack(spacing: 30) {
+                LazyVGrid(columns: columns, spacing: 60) {
                     allSkillsView
                 }
+                .frame(maxHeight: .infinity, alignment: .top)
+                .padding(16)
                 .safeAreaInset(edge: .bottom) {
                     EmptyView()
                         .frame(height: Measures.kTabBarHeight + 60)
                 }
                 .safeAreaInset(edge: .top) {
                     EmptyView()
-                        .frame(height: Measures.kTopShapeHeightSmaller )
+                        .frame(height: Measures.kTopShapeHeightSmaller + (filterDeploy == nil ? -30 : 0))
                 }
                 .safeAreaTopPadding(proxy: proxy)
                 .overlay(alignment: .top) {
@@ -51,8 +75,10 @@ struct HomeView: View {
             .onAppear {
                 Task {
                     await databaseManager.fetchCategories()
+                    try await databaseManager.syncSkills()
                 }
             }
+           
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(ColorManager.bgColor)
@@ -73,14 +99,29 @@ extension HomeView {
             VStack(spacing: 15) {
               
                 Color.clear
-                    .frame(height: max(40, proxy.safeAreaInsets.top + progress * 10))
+                    .frame(height: max(35, proxy.safeAreaInsets.top + progress * 20))
                
                 searcherTextfield
                     .padding(.horizontal, Measures.kHomeHorizontalPadding)
-              
                 VStack(alignment: .leading ,spacing: 10) {
-                    CategoryCapsuleView(selectedCategories: $selectedCategories, categories: databaseManager.categories)
+                    VStack(alignment: .leading, spacing: 3) {
+                        filterHeader(.categories, content: {
+                            CategoryCapsuleView(selectedCategories: $selectedCategories, categories: databaseManager.categories)
+                        })
+                    }
                     homeOnlineHeader
+                    if minY > 80 {
+                        ProgressView()
+                            .tint(ColorManager.primaryBasicColor)
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .onAppear {
+                                Task {
+                                    await databaseManager.fetchCategories()
+                                    try await Task.sleep(nanoseconds: 2_000_000_000)
+                                    try await databaseManager.syncSkills()
+                                }
+                            }
+                    }
                 }
                 .opacity(interpolatedOpacity)
             }
@@ -132,39 +173,75 @@ extension HomeView {
     
     @ViewBuilder
     private var homeOnlineHeader: some View {
-        OnlineFilterView(onlineState: $onlineState)
+        filterHeader(.online, content: {
+            OnlineFilterView(onlineState: $onlineState)
+        })
     }
     
     /// Skills view based on filters
     @ViewBuilder
     private var allSkillsView: some View {
-        LazyVStack(spacing: 30) {
-            if !databaseManager.allSkillsSaved.isEmpty {
-                let filteredSkills = databaseManager.allSkillsSaved
-                    .filter { skill in // 3. Filter based on categories
-                        selectedCategories.isEmpty || selectedCategories.contains(skill.category)
+        if !databaseManager.allSkillsSaved.isEmpty {
+            let filteredSkills = databaseManager.allSkillsSaved
+                .filter { skill in // 3. Filter based on categories
+                    selectedCategories.isEmpty || selectedCategories.contains(skill.category)
+                }
+                .filter { skill in
+                    // 2. Filter based in onLine / inPerson
+                    switch onlineState {
+                    case .online:
+                        return skill.category.is_manual == false || skill.is_online == true
+                    case .inPerson:
+                        return skill.category.is_manual == true || skill.is_online == false
+                    case .all:
+                        return true
                     }
-                    .filter { skill in
-                        // 2. Filter based in onLine / inPerson
-                        switch onlineState {
-                        case .online:
-                            return skill.category.is_manual == false || skill.is_online == true
-                        case .inPerson:
-                            return skill.category.is_manual == true || skill.is_online == false
-                        case .all:
-                            return true
-                        }
-                    }
-                    .filter { skill in // 3. Textfield filter
-                        searchText.isEmpty || // 3.1. If no text
-                        skill.name.lowercased().contains(searchText.lowercased()) || // 3.2. Search by name
-                        skill.description.lowercased().contains(searchText.lowercased()) // 3.3. Search by description
-                    }
-                
-                ForEach(filteredSkills) { skill in
-                    SkillCardView(skill: skill)
+                }
+                .filter { skill in // 3. Textfield filter
+                    searchText.isEmpty || // 3.1. If no text
+                    skill.name.lowercased().contains(searchText.lowercased()) || // 3.2. Search by name
+                    skill.description.lowercased().contains(searchText.lowercased()) // 3.3. Search by description
+                }
+            
+            ForEach(filteredSkills) { skill in
+                SkillRowView(skill: skill)
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func categoryHeader(_ deploy: FilterDeploy) -> some View {
+        Text(deploy.description)
+            .foregroundStyle(ColorManager.primaryGrayColor)
+            .font(.custom(CustomFonts.medium, size: 17))
+    }
+    
+    @ViewBuilder
+    private func filterHeader<Content: View>(_ deploy: FilterDeploy, @ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 5) {
+            VStack(alignment: .leading, spacing: 10) {
+                HStack {
+                    categoryHeader(deploy)
+                    Spacer()
+                    Image(systemName: filterDeploy == deploy ? "chevron.up" : "chevron.down")
                 }
             }
+            .padding(.horizontal, Measures.kHomeHorizontalPadding + 3)
+            .onTapGesture {
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    if filterDeploy == deploy {
+                        filterDeploy = nil
+                    } else {
+                        filterDeploy = deploy
+                    }
+                }
+            }
+            if filterDeploy == deploy {
+                content()
+                    .transition(.move(edge: .top).combined(with: .opacity))
+            }
+            Divider()
+                .padding(.horizontal, Measures.kHomeHorizontalPadding + 3)
         }
     }
 }

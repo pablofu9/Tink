@@ -32,7 +32,7 @@ extension Skill {
     )
     static let sample1 = Skill(
         id: "2",
-        name: "Clases online",
+        name: "Esta va a ser el ejemplop de la descripcion",
         description: "Clases online de ingles",
         price: "5 e/h",
         category: FSCategory.sampleCategory,

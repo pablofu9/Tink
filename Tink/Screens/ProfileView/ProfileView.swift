@@ -166,29 +166,25 @@ extension ProfileView {
     /// Skills view
     @ViewBuilder
     private var skillsView: some View {
-        if !databaseManager.skillsSaved.isEmpty {
-            let filteredSkills = databaseManager.skillsSaved.filter { skill in
-                return skill.user.id == UserDefaults.standard.userSaved?.id
-            }
-            
-            if !filteredSkills.isEmpty {
-                VStack(alignment: .leading, spacing: 5) {
-                    Text("PROFILE_YOUR_SKILLS".localized)
-                        .font(.custom(CustomFonts.bold, size: 25))
-                        .foregroundStyle(ColorManager.primaryGrayColor)
-                        .padding(.horizontal, Measures.kHomeHorizontalPadding)
-                    Button {
-                        if databaseManager.currentIndex <= filteredSkills.count {
-                            selectedSkillToModify = filteredSkills[databaseManager.currentIndex]
-                        }
-                    } label: {
-                        SkillCarouselView(skills: filteredSkills, selectedIndex: $databaseManager.currentIndex)
+        if !databaseManager.filteredSkills.isEmpty {
+            VStack(alignment: .leading, spacing: 5) {
+                Text("PROFILE_YOUR_SKILLS".localized)
+                    .font(.custom(CustomFonts.bold, size: 25))
+                    .foregroundStyle(ColorManager.primaryGrayColor)
+                    .padding(.horizontal, Measures.kHomeHorizontalPadding)
+                Button {
+                    if databaseManager.currentIndex <= databaseManager.filteredSkills.count {
+                        selectedSkillToModify = databaseManager.filteredSkills[databaseManager.currentIndex]
                     }
+                } label: {
+                    SkillCarouselView(selectedIndex: $databaseManager.currentIndex)
                 }
             }
         }
+
     }
     
+    /// Information view
     @ViewBuilder
     private var informationView: some View {
         if let profileSaved = UserDefaults.standard.userSaved {
