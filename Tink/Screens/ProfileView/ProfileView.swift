@@ -22,6 +22,9 @@ struct ProfileView: View {
     // MARK: - CONTROL MODIFY SKILL
     @State var selectedSkillToModify: Skill?
     
+    // MARK: - LOGOUT ALERT
+    @State private var logoutAlert: Bool = false
+    
     // MARK: - BODY
     var body: some View {
         ZStack(alignment: .top) {
@@ -49,12 +52,26 @@ struct ProfileView: View {
             }
             .coordinateSpace(name: "SCROLL")
         }
-        .sheet(item: $selectedSkillToModify, onDismiss: {
-            // Aquí también puedes realizar acciones cuando el `sheet` se cierra.
-            print("Sheet dismissed")
-        }) { skill in
-            if selectedSkillToModify != nil {
-                NewSkillView(isMiddlePressed: .constant(false), skill: skill)
+        .sheet(item: $selectedSkillToModify) { skill in
+            NewSkillView(isMiddlePressed: .constant(false), skill: skill)
+        }
+        .overlay {
+            if logoutAlert {
+                CustomAlert(
+                    title: "SETTINGS_LOGOUT".localized,
+                    bodyText: "ALERT_LOGOUT_BODY".localized,
+                    acceptAction: {
+                        Task {
+                            try authenticatorManager.signOut()
+                        }
+                    },
+                    cancelAction: {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            logoutAlert = false
+                        }
+                    }
+                )
+                .transition(.asymmetric(insertion: .move(edge: .top).combined(with: .opacity), removal: .opacity))
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -125,8 +142,8 @@ extension ProfileView {
     @ViewBuilder
     private var logoutButton: some View {
         Button {
-            Task {
-                try authenticatorManager.signOut()
+            withAnimation(.easeInOut(duration: 0.3)) {
+                logoutAlert = true
             }
         } label: {
             HStack {

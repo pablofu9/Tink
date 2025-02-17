@@ -15,15 +15,17 @@ import FirebaseFirestore
 import Combine
 
 @MainActor
+@Observable
 class FSDatabaseManager: ObservableObject {
     
-    @Published var categories: [FSCategory] = []
-    @Published var loading: Bool = false
-    @Published var goCompleteProfile = false
-    @Published var skillsSaved: [Skill] = []
+    var categories: [FSCategory] = []
+    var loading: Bool = false
+    var goCompleteProfile = false
+    var skillsSaved: [Skill] = []
+    var allSkillsSaved: [Skill] = []
    
     // MARK: - CAROUSEL CONTROLLER
-    @Published var currentIndex: Int = 0
+     var currentIndex: Int = 0
     
     func fetchCategories() async {
         if self.categories.isEmpty {
@@ -216,24 +218,30 @@ class FSDatabaseManager: ObservableObject {
         loading = true
         defer { loading = false }
         guard let userSaved = UserDefaults.standard.userSaved else {
-             print("No hay usuario guardado")
-             return
-         }
-            self.skillsSaved = []
-            let db = Firestore.firestore()
-            let query = db.collection("skills")
-            do {
-                let snapshot = try await query.getDocuments()
-                let skills = snapshot.documents.compactMap { document in
-                    let skill = try? document.data(as: Skill.self)
-                    return skill?.user.id == userSaved.id ? skill : nil
-                }
-                self.skillsSaved = skills
-                print("✅ Correctly sync skills")
-            } catch {
-                print("Erorr loading categories", error)
+            print("No hay usuario guardado")
+            return
+        }
+        self.skillsSaved = []
+        self.allSkillsSaved = []
+        let db = Firestore.firestore()
+        let query = db.collection("skills")
+        do {
+            let snapshot = try await query.getDocuments()
+            let allSkills = snapshot.documents.compactMap { document in
+                try? document.data(as: Skill.self)
             }
+            
+            // 1. Saved every skill with no filter
+            self.allSkillsSaved = allSkills
+            
+            // 2. Filter skills if user.id == userSaved.id
+            self.skillsSaved = allSkills.filter { $0.user.id == userSaved.id }
+            print("✅ Correctly sync skills")
+        } catch {
+            print("Erorr loading categories", error)
+        }
     }
+    
     
     /// Update Skill
     func updateSkill(skill: Skill) async throws {
@@ -260,9 +268,8 @@ class FSDatabaseManager: ObservableObject {
 
             // 3. Actualizar localmente en UserDefaults (en hilo principal)
             if let index = self.skillsSaved.firstIndex(where: { $0.id == skill.id }) {
-                self.skillsSaved.remove(at: index)
+                self.skillsSaved[index] = skill
             }
-            skillsSaved.append(skill)
             currentIndex = 0
             print("✅ Skill updated in Firestore: \(skill.id)")
         } catch {

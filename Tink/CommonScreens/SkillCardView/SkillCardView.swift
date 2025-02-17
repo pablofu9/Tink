@@ -75,18 +75,26 @@ extension SkillCardView {
         .offset(y: -10)
     }
     
-    /// Image view
     @ViewBuilder
     private var imageView: some View {
-        if let imageUrl = skill.category.image_url {
-            WebImage(url: URL(string: imageUrl))
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(width: UIScreen.main.bounds.width - 26, height: 280)
-                .cornerRadius(10)
+        if let imageUrl = skill.category.image_url, let url = URL(string: imageUrl) {
+            AsyncImage(url: url) { phase in
+                switch phase {
+                case .empty:
+                    ProgressView()
+                case .success(let image):
+                    image.resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: UIScreen.main.bounds.width - 26, height: 280)
+                        .cornerRadius(10)
+                case .failure:
+                    Color.gray.frame(width: UIScreen.main.bounds.width - 26, height: 280)
+                @unknown default:
+                    Color.gray.frame(width: UIScreen.main.bounds.width - 26, height: 280)
+                }
+            }
         } else {
-            ColorManager.defaultWhite
-                .frame(width:  UIScreen.main.bounds.width - 26, height: 280)
+            Color.gray.frame(width: UIScreen.main.bounds.width - 26, height: 280)
         }
     }
     

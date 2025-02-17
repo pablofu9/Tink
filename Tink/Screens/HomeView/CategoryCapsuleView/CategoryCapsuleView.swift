@@ -9,61 +9,63 @@ import SwiftUI
 
 struct CategoryCapsuleView: View {
     
-    @Binding var selectedCategory: FSCategory?
+    // MARK: - SELECTED CATEGORIES
+    @Binding var selectedCategories: [FSCategory]
+    
+    // MARK: - ALL CATEGORIES
     var categories: [FSCategory]
     
     // MARK: - BODY
-     var body: some View {
-         
-         let sortedCategories = categories.sorted {
-               if $0.name == "todas" { return true }
-               if $1.name == "todas" { return false }
-               return $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
-           }
-         
-         ScrollView(.horizontal) {
-             HStack(spacing: 10) {
-                 ForEach(sortedCategories) { category in
-                     categoryCapsule(category)
-                 }
-             }
-             .safeAreaInset(edge: .leading) {
-                 Color.clear
-                     .frame(width: Measures.kHomeHorizontalPadding, height: 0)
-             }
-             .safeAreaInset(edge: .trailing) {
-                 Color.clear
-                     .frame(width: Measures.kHomeHorizontalPadding, height: 0)
-             }
-         }
-         .scrollIndicators(.hidden)
-         .onChange(of: categories) {
-             if !categories.isEmpty {
-                 if let todasCategory = categories.first(where: { $0.name == "todas" }) {
-                     selectedCategory = todasCategory
-                 }
-             }
-         }
-     }
+    var body: some View {
+        
+        //  Sorted categories
+        let sortedCategories = categories.sorted {
+            return $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
+        }
+        
+        // Scroll view for categories
+        ScrollView(.horizontal) {
+            HStack(spacing: 10) {
+                ForEach(sortedCategories) { category in
+                    categoryCapsule(category)
+                }
+            }
+            .safeAreaInset(edge: .leading) {
+                Color.clear
+                    .frame(width: Measures.kHomeHorizontalPadding, height: 0)
+            }
+            .safeAreaInset(edge: .trailing) {
+                Color.clear
+                    .frame(width: Measures.kHomeHorizontalPadding, height: 0)
+            }
+        }
+        .scrollIndicators(.hidden)
+    }
     
-    // Categori capsule
+    // Category capsule
     @ViewBuilder
     private func categoryCapsule(_ category: FSCategory) -> some View {
         Button {
             withAnimation(.easeIn(duration: 0.2)) {
-                selectedCategory = category
+                if let index = selectedCategories.firstIndex(where: { $0.id == category.id }) {
+                    // Si ya está seleccionada, la quitamos
+                    selectedCategories.remove(at: index)
+                } else {
+                    // Si no está seleccionada, la añadimos
+                    selectedCategories.append(category)
+                }
             }
         } label: {
             Text(category.name)
                 .font(.custom(CustomFonts.regular, size: 18))
-                .foregroundStyle(selectedCategory == category ? ColorManager.defaultWhite : ColorManager.primaryGrayColor)
+                .foregroundStyle(selectedCategories.contains(where: { $0.id == category.id }) ? ColorManager.defaultWhite : ColorManager.primaryGrayColor)
                 .padding(.horizontal, 9)
                 .padding(.vertical, 2)
                 .background {
-                    if selectedCategory == category {
+                    if selectedCategories.contains(where: { $0.id == category.id }) {
                         Capsule()
                             .fill(ColorManager.primaryBasicColor)
-                            .transition(.blurReplace)
+                            .transition(.opacity)
                     }
                     Capsule()
                         .stroke(lineWidth: 1)
@@ -75,9 +77,9 @@ struct CategoryCapsuleView: View {
 }
 
 #Preview {
-    @Previewable @State var selectedCategory: FSCategory?
+    @Previewable @State var selectedCategories: [FSCategory] = []
     let categories: [FSCategory] = [ FSCategory(id: "1", name: "Albañilería", is_manual: true),
                                      FSCategory(id: "2", name: "Carpintería", is_manual: true),
                                      FSCategory(id: "3", name: "Clases online", is_manual: false)]
-    CategoryCapsuleView(selectedCategory: $selectedCategory, categories: categories)
+    CategoryCapsuleView(selectedCategories: $selectedCategories, categories: categories)
 }

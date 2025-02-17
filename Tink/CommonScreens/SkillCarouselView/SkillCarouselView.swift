@@ -19,6 +19,7 @@ struct SkillCarouselView: View {
                 ForEach(skills.indices, id: \.self) { index in
                     SkillCardView(skill: skills[index])
                         .tag(index)
+                        .id(skills[index].id) 
                        
                 }
             }

@@ -31,6 +31,7 @@
 "TYPE_NAME"                                     = "Escribe tu nombre aquí";
 "TYPE_SURNAME"                                  = "Escribe tus apellidos aqui";
 "NEED_COMPLETE_PROFILE"                         = "Tienes que completar tu perfíl para empezar a crear anuncios";
+"CANCEL"                                        = "Cancelar";
 
 /*************************************/
 // MARK: - LOGIN VIEW
@@ -117,6 +118,7 @@
 "NEW_SKILL_PRICE_FORMAT"                        = "Formato";
 "NEW_SKILL_ONLINE"                              = "Online";
 "NEW_SKILL_PRESENCIAL"                          = "Presencial";
+"NEW_SKILL_BOTH"                                = "Ambas";
 "NEW_SKILL_WHERE_OFFER"                         = "¿Donde ofreces el servicio?";
 "NEW_SKILL_CREATE_ANNOUNCE"                     = "Crear anuncio";
 "MODIFY_SKILL_HEADER"                           = "Modifica tu anuncio";
@@ -132,3 +134,4 @@
 
 "PROFILE_YOUR_SKILLS"                           = "Tus anuncios";
 "PROFILE_YOUR_INFORMATION"                      = "Tu información";
+
