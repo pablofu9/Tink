@@ -11,7 +11,7 @@ import SDWebImageSwiftUI
 struct SkillCardView: View {
     
     var skill: Skill
-
+    
     // MARK: - BODY
     var body: some View {
         GeometryReader { proxy in
@@ -26,7 +26,7 @@ struct SkillCardView: View {
                             .lineLimit(1)
                             .multilineTextAlignment(.leading)
                         Spacer()
-                        Text(skill.user.name)
+                        Text(UserDefaults.standard.userSaved?.name ?? "User")
                             .font(.custom(CustomFonts.light, size: 17))
                             .foregroundStyle(ColorManager.defaultWhite)
                     }

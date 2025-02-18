@@ -12,12 +12,11 @@ struct User: Identifiable, Codable {
     var id: String
     var name: String
     var email: String
-    var surname: String
     var community: String
     var province: String
     var locality: String
 }
 
 extension User {
-    static let sampleUser =  User(id: "1", name: "Juan", email: "Juan@gmail.com", surname: "Fernandez Lopez", community: "Madrid", province: "Madrid", locality: "Madrid")
+    static let sampleUser =  User(id: "1", name: "Juan", email: "Juan@gmail.com", community: "Madrid", province: "Madrid", locality: "Madrid")
 }

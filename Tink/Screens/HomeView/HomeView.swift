@@ -49,12 +49,12 @@ struct HomeView: View {
        ]
     // Selected skill for navigation
     @State private var selectedSkill: Skill?
-    
+
     // MARK: - BODY
     var body: some View {
         ZStack(alignment: .top) {
             ScrollView {
-                LazyVGrid(columns: columns, spacing: 60) {
+                LazyVGrid(columns: columns, spacing: 50) {
                     allSkillsView
                 }
                 .frame(maxHeight: .infinity, alignment: .top)
@@ -120,6 +120,7 @@ extension HomeView {
                             .frame(maxWidth: .infinity, alignment: .center)
                             .onAppear {
                                 Task {
+                                    databaseManager.loading = true
                                     try await Task.sleep(nanoseconds: 2_000_000_000)
                                     try await databaseManager.syncSkills()
                                 }

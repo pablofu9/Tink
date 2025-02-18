@@ -14,8 +14,6 @@ struct ProfileView: View {
     @Environment(AuthenticatorManager.self) private var authenticatorManager
     @EnvironmentObject var databaseManager: FSDatabaseManager
     
-   
-    
     // MARK: - TOGGLE VIEW
     @State var toggleView: Bool = false
     
@@ -25,16 +23,39 @@ struct ProfileView: View {
     // MARK: - LOGOUT ALERT
     @State private var logoutAlert: Bool = false
     
+    // MARK: - NAME VIEW
+    @State private var nameView: String = ""
+    
+    var isButtonDisabled: Bool {
+        return nameView != UserDefaults.standard.userSaved?.name
+    }
+    
     // MARK: - BODY
     var body: some View {
+        content
+    }
+}
+
+// MARK: - SUBVIEWS
+extension ProfileView {
+    
+    /// Content view
+    @ViewBuilder
+    private var content: some View {
         ZStack(alignment: .top) {
             ScrollView {
                 if let _ = UserDefaults.standard.userSaved {
                     LazyVStack(alignment: .leading,spacing: 20) {
                         skillsView
                         informationView
+                        
+                        if isButtonDisabled {
+                            updateProfile
+                                .padding(.horizontal, Measures.kHomeHorizontalPadding)
+                        }
                         logoutButton
                             .padding(.horizontal, Measures.kHomeHorizontalPadding)
+                       
                     }
                     .safeAreaInset(edge: .top) {
                         EmptyView()
@@ -76,10 +97,12 @@ struct ProfileView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(ColorManager.bgColor)
+        .onAppear {
+            if let user = UserDefaults.standard.userSaved {
+                nameView = user.name
+            }
+        }
     }
-}
-
-extension ProfileView {
     
     /// Header View
     @ViewBuilder
@@ -121,7 +144,7 @@ extension ProfileView {
     
     /// Custom Row View
     @ViewBuilder
-    private func rowView(name: String, text: String, udText: String) -> some View {
+    private func rowView(name: String, text: String, udText: String, isName: Bool = false) -> some View {
         VStack(alignment: .leading, spacing: 5) {
             HStack(spacing: 10) {
                 Image(systemName: name)
@@ -130,11 +153,25 @@ extension ProfileView {
                     .font(.custom(CustomFonts.regular, size: 18))
                     .foregroundStyle(ColorManager.primaryGrayColor.opacity(0.6))
             }
-          
-            Text(udText)
-                .font(.custom(CustomFonts.regular, size: 19))
-                .foregroundStyle(ColorManager.defaultBlack)
-            Divider()
+            if isName {
+                TextField("", text: $nameView)
+                    .font(.custom(CustomFonts.regular, size: 19))
+                    .foregroundStyle(ColorManager.defaultBlack)
+                    .background(alignment: .bottom) {
+                        Divider()
+                    }
+                    .overlay(alignment: .trailing) {
+                        Image(systemName: "pencil")
+                            .renderingMode(.template)
+                            .padding(.trailing, 5)
+                            .foregroundStyle(ColorManager.defaultBlack)
+                    }
+            } else {
+                Text(udText)
+                    .font(.custom(CustomFonts.regular, size: 19))
+                    .foregroundStyle(ColorManager.defaultBlack)
+                Divider()
+            }
         }
     }
     
@@ -192,11 +229,36 @@ extension ProfileView {
                 Text("PROFILE_YOUR_INFORMATION".localized)
                     .font(.custom(CustomFonts.bold, size: 25))
                     .foregroundStyle(ColorManager.primaryGrayColor)
-                rowView(name: "person.fill", text: "NAME".localized, udText: "\(profileSaved.name) \(profileSaved.surname)")
+                rowView(name: "person.fill", text: "NAME".localized, udText: "\(profileSaved.name)", isName: true)
                 rowView(name: "envelope.fill", text: "LOGIN_EMAIL".localized, udText: profileSaved.email)
                 rowView(name: "map.fill", text: "LOCALITY".localized, udText: "\(profileSaved.locality), \(profileSaved.province)")
             }
             .padding(.horizontal, Measures.kHomeHorizontalPadding)
+        }
+    }
+    
+    /// Loogut button
+    @ViewBuilder
+    private var updateProfile: some View {
+        Button {
+            Task {
+                try await databaseManager.updateUser(name: nameView)
+            }
+        } label: {
+            HStack {
+                Image(systemName: "pencil.line")
+                    .foregroundStyle(ColorManager.primaryBasicColor)
+                Text("PROFILE_UPDATE_PROFILE".localized)
+                    .font(.custom(CustomFonts.regular, size: 19))
+                    .foregroundStyle(ColorManager.primaryBasicColor)
+            }
+            .padding(.vertical, 7)
+            .frame(maxWidth: .infinity)
+            .overlay {
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(lineWidth: 1)
+                    .foregroundStyle(ColorManager.primaryBasicColor)
+            }
         }
     }
 }

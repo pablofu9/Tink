@@ -28,7 +28,7 @@ class FSDatabaseManager: ObservableObject {
         let userId = UserDefaults.standard.userSaved?.id
         return skillsSaved.filter { $0.user.id == userId }
     }
-   
+       
     // MARK: - CAROUSEL CONTROLLER
     var currentIndex: Int = 0
     
@@ -66,13 +66,12 @@ class FSDatabaseManager: ObservableObject {
             
             if snapshot.exists {
                 if let userData = snapshot.data(),
-                   let surname = userData["surname"] as? String,
                    let name = userData["name"] as? String,
                    let email = userData["email"] as? String,
                    let community = userData["community"] as? String,
                    let province = userData["province"] as? String,
                    let locality = userData["locality"] as? String,
-                   !surname.isEmpty {
+                   !community.isEmpty {
                     goCompleteProfile = false
                     
                     // Store userdefault usersaved data
@@ -81,7 +80,6 @@ class FSDatabaseManager: ObservableObject {
                             id: user.uid,
                             name: name,
                             email: email,
-                            surname: surname,
                             community: community,
                             province: province ,
                             locality: locality
@@ -118,8 +116,7 @@ class FSDatabaseManager: ObservableObject {
         do {
             let snapshot = try await userRef.getDocument()
             let userData: [String: String] = [
-                "name": name,
-                "surname": surname,
+                "name": "\(name) \(surname)",
                 "community": community,
                 "province": province,
                 "locality": locality
@@ -130,9 +127,8 @@ class FSDatabaseManager: ObservableObject {
                 
                 UserDefaults.standard.userSaved = User(
                     id: user.uid,
-                    name: name,
+                    name: "\(name) \(surname)",
                     email: user.email ?? "",
-                    surname: surname,
                     community: community,
                     province: province ,
                     locality: locality
@@ -150,9 +146,8 @@ class FSDatabaseManager: ObservableObject {
                 try await userRef.setData(newUser)
                 UserDefaults.standard.userSaved = User(
                     id: user.uid,
-                    name: name,
+                    name: "\(name) \(surname)",
                     email: user.email ?? "",
-                    surname: surname,
                     community: community,
                     province: province ,
                     locality: locality
@@ -166,6 +161,69 @@ class FSDatabaseManager: ObservableObject {
             print("❌ Firestore error: \(error.localizedDescription)")
         }
         loading = false
+    }
+    
+    /// Update User
+    func updateUser(name: String) async throws {
+        loading = true
+        defer {
+            loading = false
+        }
+        
+        // 1. Verify if user is authenticated
+        guard let user = UserDefaults.standard.userSaved else {
+            print("No user authenticated")
+            return
+        }
+        
+        // 2. Reference to user document based on user ID
+        let db = Firestore.firestore()
+        let userRef = db.collection("users").document(user.id)
+        
+        do {
+            // 3. Codify user
+            let userData: [String: Any] = [
+                "name": name // Solo se actualiza el campo "name"
+            ]
+            
+            // 4. Update Firestore
+            try await userRef.setData(userData, merge: true)
+            
+            // 5. Update in UserDefaults
+            if var savedUser = UserDefaults.standard.userSaved {
+                savedUser.name = name
+                UserDefaults.standard.userSaved = savedUser
+            }
+            print("✅ Updated user in firestore: \(name)")
+            try await updateSkillsForUser(userId: user.id, newName: name)
+            withAnimation(.easeInOut(duration: 0.2)) {
+                self.goCompleteProfile = false
+            }
+            
+        } catch {
+            throw NSError(domain: "FirestoreError", code: 500, userInfo: [
+                NSLocalizedDescriptionKey: "Error updating user in Firestore: \(error.localizedDescription)"
+            ])
+        }
+    }
+    
+    /// Update skills for user
+    func updateSkillsForUser(userId: String, newName: String) async throws {
+        let db = Firestore.firestore()
+        
+        // 1. Obtain skills based on ID
+        let skillsQuery = db.collection("skills").whereField("user.id", isEqualTo: userId)
+        let snapshot = try await skillsQuery.getDocuments()
+        
+        for document in snapshot.documents {
+            Task.detached {
+                let skillRef = db.collection("skills").document(document.documentID)
+                try await skillRef.updateData([
+                    "user.name": newName
+                ])
+            }
+        }     
+        print("✅ User skills from user: \(userId) Updated with : \(newName)")
     }
     
     /// Function to create new skills
@@ -213,6 +271,7 @@ class FSDatabaseManager: ObservableObject {
                     print("✅ New skill added to Firestore with ID: \(newSkill.id)")
                 }
             }
+            try await syncSkills()
             currentIndex = 0
         } catch {
             throw NSError(domain: "FirestoreError", code: 500, userInfo: [NSLocalizedDescriptionKey: "Error adding skill to Firestore: \(error.localizedDescription)"])

@@ -22,7 +22,7 @@ struct MainView: View {
     @State private var activeTab: TabModel = .home
     @State private var isMiddlePressed: Bool = false
     @EnvironmentObject var databaseManager: FSDatabaseManager
-
+    
     var body: some View {
         content
             .onAppear {

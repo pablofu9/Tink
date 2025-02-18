@@ -13,7 +13,10 @@ struct SkillDetailView: View {
     // MARK: - SKILL PROPERTY
     let skill: Skill
     @Environment(\.dismiss) private var dismiss
-
+    @State var offsetX: CGFloat = .zero
+    var computedOpacity: CGFloat {
+        return 1 - min(abs(offsetX) / 200, 1)
+    }
     // MARK: - BODY
     var body: some View {
         GeometryReader { reader in
@@ -39,14 +42,38 @@ struct SkillDetailView: View {
                         headerView(reader)
                     }
                 }
+                .scrollDisabled(offsetX != .zero)
                 .scrollBounceBehavior(.basedOnSize)
                 .coordinateSpace(name: "SCROLL")
                 .scrollIndicators(.hidden)
             }
             .ignoresSafeArea()
         }
+  
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(ColorManager.bgColor)
+        .gesture(
+            DragGesture()
+                .onChanged { value in
+                    if value.translation.width > 0 {
+                        withAnimation(.easeInOut(duration: 0.4)) {
+                            offsetX = value.translation.width
+                        }
+                    }
+                }
+                .onEnded { value in
+                    if value.translation.width < 140 {
+                        withAnimation(.easeInOut(duration: 0.4)) {
+                            offsetX = .zero
+                        }
+                    } else {
+                        withAnimation(.easeInOut(duration: 0.4)) {
+                            offsetX = .zero
+                            dismiss()
+                        }
+                    }
+                }
+        )
     }
 }
 
@@ -192,7 +219,7 @@ extension SkillDetailView {
             if let categoryIsOnline = skill.category.is_manual {
                 if categoryIsOnline {
                     horizontalInfoRow("NEW_SKILL_PRESENCIAL".localized, info: "NEW_SKILL_PRESENCIAL".localized, hasDivider: true,icon: .inPersonIcon)
-                    horizontalInfoRow("LOCALITY".localized, info: skill.user.locality)
+                    horizontalInfoRow("LOCALITY".localized, info: "\(skill.user.locality), \(skill.user.province)")
                 } else {
                     horizontalInfoRow("NEW_SKILL_PRESENCIAL".localized, info: "NEW_SKILL_ONLINE".localized, icon: .onlineIcon)
                 }
@@ -202,7 +229,7 @@ extension SkillDetailView {
                         horizontalInfoRow("NEW_SKILL_PRESENCIAL".localized, info: "NEW_SKILL_ONLINE".localized, icon: .onlineIcon)
                     } else {
                         horizontalInfoRow("NEW_SKILL_PRESENCIAL".localized, info: "NEW_SKILL_PRESENCIAL".localized, hasDivider: true,icon: .inPersonIcon)
-                        horizontalInfoRow("LOCALITY".localized, info: skill.user.locality)
+                        horizontalInfoRow("LOCALITY".localized, info: "\(skill.user.locality), \(skill.user.province)")
                     }
                 }
             }
@@ -223,7 +250,7 @@ extension SkillDetailView {
                     iconView(icon)
                 }
                 Text(info)
-                    .font(.custom(CustomFonts.bold, size: 16))
+                    .font(.custom(CustomFonts.regular, size: 16))
                     .foregroundStyle(ColorManager.primaryBasicColor)
             }
             if hasDivider {
@@ -235,6 +262,7 @@ extension SkillDetailView {
         }
     }
     
+    /// Icon View
     @ViewBuilder
     private func iconView(_ image: ImageResource) -> some View {
         Image(image)
@@ -245,6 +273,7 @@ extension SkillDetailView {
         
     }
     
+    /// User Info View
     @ViewBuilder
     private func userInfoView(_ header: String) -> some View {
         VStack(alignment: .leading, spacing: 10) {
