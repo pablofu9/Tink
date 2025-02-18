@@ -24,12 +24,11 @@ struct SkillRowView: View {
         GeometryReader { proxy in
             ZStack(alignment: .top) {
                 VStack(alignment: .leading,spacing: 10) {
-                    nameAndUser
-                    imageView
+                    imageView(proxy)
                     
                     HStack {
                         Text(skill.price)
-                            .font(.custom(CustomFonts.bold, size: 16))
+                            .font(.custom(CustomFonts.regular, size: 16))
                             .foregroundStyle(ColorManager.primaryGrayColor)
                         Spacer()
                     }
@@ -52,9 +51,6 @@ struct SkillRowView: View {
             }
             .frame(height: proxy.size.height, alignment: .top)
         }
-        .onAppear {
-            
-        }
         .frame(width: (UIScreen.main.bounds.size.width - 48) / 2)
         .frame(height: totalHeight, alignment: .top)
     }
@@ -68,7 +64,7 @@ extension SkillRowView {
     private func capsuleView(_ text: String) -> some View {
         Text(text)
             .foregroundStyle(ColorManager.defaultWhite)
-            .font(.custom(CustomFonts.regular, size: 16))
+            .font(.custom(CustomFonts.regular, size: 15))
             .padding(.horizontal, 10)
             .padding(.vertical, 1)
             .background(ColorManager.primaryBasicColor)
@@ -82,41 +78,51 @@ extension SkillRowView {
     
     /// Image view
     @ViewBuilder
-    private var imageView: some View {
-        if let imageUrl = skill.category.image_url, let url = URL(string: imageUrl) {
-            WebImage(url: url) { phase in
-                switch phase {
-                case .empty:
-                    ProgressView()
-                case .success(let image):
-                    image.resizable()
-                        .frame(height: imageHeight)
-                        .cornerRadius(10)
-                case .failure:
-                    LoadingView()
-                        .frame(height: imageHeight)
-                        .cornerRadius(10)
-                @unknown default:
-                    LoadingView()
-                        .frame(height: imageHeight)
-                        .cornerRadius(10)
+    private func imageView(_ proxy: GeometryProxy) -> some View {
+        ZStack(alignment: .bottom) {
+            if let imageUrl = skill.category.image_url, let url = URL(string: imageUrl) {
+                WebImage(url: url) { phase in
+                    switch phase {
+                    case .empty:
+                        ProgressView()
+                    case .success(let image):
+                        image.resizable()
+                            .frame(height: imageHeight)
+                            .cornerRadius(10)
+                    case .failure:
+                        LoadingView()
+                            .frame(height: imageHeight)
+                            .cornerRadius(10)
+                    @unknown default:
+                        LoadingView()
+                            .frame(height: imageHeight)
+                            .cornerRadius(10)
+                    }
                 }
+            } else {
+                ColorManager.primaryGrayColor.opacity(0.5)
+                    .frame(height: imageHeight)
+                    .cornerRadius(10)
             }
-        } else {
-            ColorManager.primaryGrayColor.opacity(0.5)
-                .frame(height: imageHeight)
-                .cornerRadius(10)
+            VStack(alignment: .leading) {
+                nameView
+                Spacer()
+                capsuleView(skill.category.name)
+            }
+            .padding(6)
+            .frame(width: proxy.size.width, height: proxy.size.height / 2.8, alignment: .topLeading)
+            .background(ColorManager.secondaryGrayColor.opacity(0.8))
+            .cornerRadius(10)
         }
     }
     
     /// Name and user view
     @ViewBuilder
-    private var nameAndUser: some View {
+    private var nameView: some View {
         HStack {
             Text(skill.name)
-                .font(.custom(CustomFonts.bold, size: 16))
+                .font(.custom(CustomFonts.bold, size: 14))
                 .foregroundStyle(ColorManager.primaryGrayColor)
-                .lineLimit(2)
                 .multilineTextAlignment(.leading)
         }
     }

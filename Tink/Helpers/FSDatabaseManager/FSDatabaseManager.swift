@@ -30,10 +30,13 @@ class FSDatabaseManager: ObservableObject {
     }
    
     // MARK: - CAROUSEL CONTROLLER
-     var currentIndex: Int = 0
+    var currentIndex: Int = 0
     
+    /// Fetch categories
     func fetchCategories() async {
         loading = true
+        defer { loading = false }
+
         if self.categories.isEmpty {
             let db = Firestore.firestore()
             let query = db.collection("categories")
@@ -48,6 +51,7 @@ class FSDatabaseManager: ObservableObject {
         }
     }
     
+    /// Check if user exists in database
     func checkIfUserExistInDatabase() async throws {
         loading = true
         guard let user = Auth.auth().currentUser else {
@@ -102,6 +106,7 @@ class FSDatabaseManager: ObservableObject {
         loading = false
     }
     
+    /// Create new user
     func createNewUser(name: String, surname: String, community: String, province: String, locality: String) async throws {
         loading = true
         guard let user = Auth.auth().currentUser else {
@@ -242,7 +247,6 @@ class FSDatabaseManager: ObservableObject {
             print("Erorr loading categories", error)
         }
     }
-    
     
     /// Update Skill
     func updateSkill(skill: Skill) async throws {

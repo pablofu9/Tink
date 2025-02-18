@@ -47,6 +47,8 @@ struct HomeView: View {
            GridItem(.flexible(), spacing: 10),
            GridItem(.flexible(), spacing: 10) 
        ]
+    // Selected skill for navigation
+    @State private var selectedSkill: Skill?
     
     // MARK: - BODY
     var body: some View {
@@ -59,7 +61,7 @@ struct HomeView: View {
                 .padding(16)
                 .safeAreaInset(edge: .bottom) {
                     EmptyView()
-                        .frame(height: Measures.kTabBarHeight + 60)
+                        .frame(height: Measures.kTabBarHeight + 70)
                 }
                 .safeAreaInset(edge: .top) {
                     EmptyView()
@@ -74,11 +76,13 @@ struct HomeView: View {
             .coordinateSpace(name: "SCROLL")
             .onAppear {
                 Task {
-                    await databaseManager.fetchCategories()
                     try await databaseManager.syncSkills()
                 }
             }
            
+        }
+        .fullScreenCover(item: $selectedSkill) { skill in
+            SkillDetailView(skill: skill)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(ColorManager.bgColor)
@@ -110,13 +114,12 @@ extension HomeView {
                         })
                     }
                     homeOnlineHeader
-                    if minY > 80 {
+                    if minY > 120 {
                         ProgressView()
                             .tint(ColorManager.primaryBasicColor)
                             .frame(maxWidth: .infinity, alignment: .center)
                             .onAppear {
                                 Task {
-                                    await databaseManager.fetchCategories()
                                     try await Task.sleep(nanoseconds: 2_000_000_000)
                                     try await databaseManager.syncSkills()
                                 }
@@ -204,7 +207,11 @@ extension HomeView {
                 }
             
             ForEach(filteredSkills) { skill in
-                SkillRowView(skill: skill)
+                Button {
+                    selectedSkill = skill
+                } label: {
+                    SkillRowView(skill: skill)
+                }
             }
         }
     }

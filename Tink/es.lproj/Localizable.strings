@@ -34,6 +34,9 @@
 "CANCEL"                                        = "Cancelar";
 "CATEGORIES"                                    = "Categorías";
 "PRESENTIALITTY"                                = "Presencialidad";
+"DESCRIPTION"                                   = "Descripción";
+"INFORMATION"                                   = "Información";
+"CATEGORY"                                      = "Categoría";
 
 /*************************************/
 // MARK: - LOGIN VIEW
@@ -137,3 +140,9 @@
 "PROFILE_YOUR_SKILLS"                           = "Tus anuncios";
 "PROFILE_YOUR_INFORMATION"                      = "Tu información";
 
+
+/*************************************/
+// MARK: - SKILL DETAIL VIEW
+/*************************************/
+"SKILL_DETAIL_INFO"                             = "Información del anunciante";
+"SKILL_DETAIL_WRITE_MESSAGE"                    = "Escribir un mensaje";

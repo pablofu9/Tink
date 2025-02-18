@@ -141,7 +141,6 @@ extension NewSkillView {
         }
         .onAppear {
             Task {
-                await databaseManager.fetchCategories()
                 initialyseModifyView()
                 databaseManager.loading = false
             }

@@ -19,5 +19,5 @@ extension FSCategory: CustomStringConvertible {
 }
 
 extension FSCategory {
-    static let sampleCategory = FSCategory(id: "1", name: "Clases online", image_url: "https://images.pexels.com/photos/2244746/pexels-photo-2244746.jpeg?auto=compress&cs=tinysrgb&w=250&h=250&dpr=2")
+    static let sampleCategory = FSCategory(id: "1", name: "Clases online", is_manual: true, image_url: "https://images.pexels.com/photos/2244746/pexels-photo-2244746.jpeg?auto=compress&cs=tinysrgb&w=250&h=250&dpr=2")
 }
