@@ -141,7 +141,11 @@ extension NewSkillView {
         }
         .onAppear {
             Task {
+                // 1. Fetch categories if empty
+                await databaseManager.fetchCategories()
+                // 2. Initialse view when modify view
                 initialyseModifyView()
+                // 3. Set loading = false
                 databaseManager.loading = false
             }
         }

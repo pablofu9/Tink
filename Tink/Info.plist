@@ -1,34 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-<dict>
-	<key>CFBundleURLTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>com.googleusercontent.apps.491797921346-03rrmmlmtbpeedtokrrkv5uuva81odt8</string>
-			</array>
-		</dict>
-	</array>
-	<key>UIAppFonts</key>
-	<array>
-		<string>Poppins-Regular.ttf</string>
-		<string>Poppins-Light.ttf</string>
-		<string>Poppins-Medium.ttf</string>
-		<string>Poppins-Bold.ttf</string>
-		<string>Poppins-SemiBold.ttf</string>
-		<string>Poppins-ExtraBold.ttf</string>
-		<string>Poppins-Thin.ttf</string>
-		<string>Poppins-ExtraLight.ttf</string>
-		<string>Poppins-Italic.ttf</string>
-		<string>Poppins-LightItalic.ttf</string>
-		<string>Poppins-MediumItalic.ttf</string>
-		<string>Poppins-BoldItalic.ttf</string>
-		<string>Poppins-SemiBoldItalic.ttf</string>
-		<string>Poppins-ExtraBoldItalic.ttf</string>
-	</array>
-</dict>
+    <dict>
+        <key>CFBundleURLTypes</key>
+        <array>
+            <dict>
+                <key>CFBundleTypeRole</key>
+                <string>Editor</string>
+                <key>CFBundleURLSchemes</key>
+                <array>
+                    <string>com.googleusercontent.apps.491797921346-03rrmmlmtbpeedtokrrkv5uuva81odt8</string>
+                </array>
+            </dict>
+        </array>
+        <key>UIAppFonts</key>
+        <array>
+            <string>Poppins-Regular.ttf</string>
+            <string>Poppins-Light.ttf</string>
+            <string>Poppins-Medium.ttf</string>
+            <string>Poppins-Bold.ttf</string>
+            <string>Poppins-SemiBold.ttf</string>
+            <string>Poppins-ExtraBold.ttf</string>
+            <string>Poppins-Thin.ttf</string>
+            <string>Poppins-ExtraLight.ttf</string>
+            <string>Poppins-Italic.ttf</string>
+            <string>Poppins-LightItalic.ttf</string>
+            <string>Poppins-MediumItalic.ttf</string>
+            <string>Poppins-BoldItalic.ttf</string>
+            <string>Poppins-SemiBoldItalic.ttf</string>
+            <string>Poppins-ExtraBoldItalic.ttf</string>
+        </array>
+        <key>NSCameraUsageDescription</key>
+        <string>Necesitamos acceder a la cámara para guardar tu foto de perfíl</string>
+        <key>NSPhotoLibraryUsageDescription</key>
+        <string>Necsitamos acceder a tu galería para seleccionar una foto de perfil.</string>
+    </dict>
 </plist>

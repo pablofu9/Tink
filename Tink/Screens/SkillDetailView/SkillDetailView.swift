@@ -285,7 +285,7 @@ extension SkillDetailView {
                     .font(.custom(CustomFonts.bold, size: 16))
                     .foregroundStyle(ColorManager.primaryGrayColor)
                 Spacer()
-                Text("Valoraciones")
+                imageProfile
             }
             Text(skill.user.email)
                 .font(.custom(CustomFonts.bold, size: 16))
@@ -308,6 +308,36 @@ extension SkillDetailView {
         .padding(.horizontal, Measures.kHomeHorizontalPadding)
     }
     
+    @ViewBuilder
+    private var imageProfile: some View {
+        if let userImage = skill.user.profileImageURL, let url = URL(string: userImage) {
+            WebImage(url: url) { phase in
+                switch phase {
+                case .empty:
+                    ProgressView()
+                case .success(let image):
+                    image
+                case .failure:
+                    LoadingView()
+                @unknown default:
+                    LoadingView()
+                }
+            }
+            .resizable()
+            .frame(width: 70, height: 70)
+            .background(ColorManager.defaultWhite)
+            .clipShape(Circle())
+            .shadow(color: ColorManager.primaryGrayColor.opacity(0.5), radius: 3, x: 2, y: 3)
+        } else {
+            Image(.noProfileIcon)
+                .resizable()
+                .frame(width: 60, height: 60)
+                .padding(10)
+                .background(ColorManager.defaultWhite)
+                .clipShape(Circle())
+                .shadow(color: ColorManager.primaryGrayColor.opacity(0.5), radius: 3, x: 2, y: 3)
+        }
+    }
 }
 
 #Preview {

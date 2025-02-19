@@ -37,6 +37,7 @@
 "DESCRIPTION"                                   = "Descripción";
 "INFORMATION"                                   = "Información";
 "CATEGORY"                                      = "Categoría";
+"CROP"                                          = "Recortar";
 
 /*************************************/
 // MARK: - LOGIN VIEW

@@ -23,7 +23,7 @@ struct SkillRowView: View {
     var body: some View {
         GeometryReader { proxy in
             ZStack(alignment: .top) {
-                VStack(alignment: .leading,spacing: 10) {
+                VStack(alignment: .leading,spacing: 1) {
                     imageView(proxy)
                     
                     HStack {
@@ -32,6 +32,9 @@ struct SkillRowView: View {
                             .foregroundStyle(ColorManager.primaryGrayColor)
                         Spacer()
                     }
+                    Text(skill.user.name)
+                        .font(.custom(CustomFonts.regular, size: 16))
+                        .foregroundStyle(ColorManager.primaryGrayColor.opacity(0.6))
                     if let categoryIsOnline = skill.category.is_manual {
                         if categoryIsOnline {
                             inPersonView

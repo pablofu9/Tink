@@ -9,16 +9,35 @@ import Foundation
 import SwiftUI
 
 struct TopShape: Shape {
+    var progress: CGFloat = 1
+
     func path(in rect: CGRect) -> Path {
         var path = Path()
         let width = rect.size.width
         let height = rect.size.height
-        path.move(to: CGPoint(x: 1.00024*width, y: 0.00434*height))
-        path.addLine(to: CGPoint(x: 0.9999*width, y: 0.92493*height))
-        path.addCurve(to: CGPoint(x: -0.0001*width, y: 0.92059*height), control1: CGPoint(x: 0.60648*width, y: 1.22964*height), control2: CGPoint(x: 0.39526*width, y: 0.3932*height))
-        path.addLine(to: CGPoint(x: 0.00024*width, y: 0))
-        path.addLine(to: CGPoint(x: 1.000*width, y: 0.00*height))
+
+        let bottomY = height * (0.92 + 0.08 * progress) // Altura inferior ajustada dinámicamente
+
+        path.move(to: CGPoint(x: width, y: 0))
+        path.addLine(to: CGPoint(x: width, y: bottomY))
+
+        if progress > 0 {
+            // Si progress > 0, mantenemos la curva
+            let curveFactor = (1 - progress) * 0.4
+            path.addCurve(
+                to: CGPoint(x: 0, y: bottomY),
+                control1: CGPoint(x: width * (0.6 + curveFactor), y: height * (1.2 - curveFactor)),
+                control2: CGPoint(x: width * (0.4 - curveFactor), y: height * (0.4 + curveFactor))
+            )
+        } else {
+            // Si progress = 0, dibujamos una línea recta en lugar de una curva
+            path.addLine(to: CGPoint(x: 0, y: bottomY))
+        }
+
+        path.addLine(to: CGPoint(x: 0, y: 0))
+        path.addLine(to: CGPoint(x: width, y: 0))
         path.closeSubpath()
+
         return path
     }
 }

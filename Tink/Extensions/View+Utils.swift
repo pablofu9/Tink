@@ -33,3 +33,28 @@ extension View {
             }
     }
 }
+
+extension View {
+    @ViewBuilder
+    func cropImagePicker(options: [Crop], show: Binding<Bool>, croppedImage: Binding<UIImage?>) -> some View {
+        
+    }
+}
+
+enum Crop: Equatable {
+    case circle
+    
+    func name() -> String {
+        switch self {
+        case .circle:
+            return "Circle"
+        }
+    }
+    
+    func size() -> CGSize {
+        switch self {
+        case .circle:
+            return .init(width: 60, height: 60)
+        }
+    }
+}

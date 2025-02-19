@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SDWebImageSwiftUI
 
 struct ProfileView: View {
     
@@ -23,12 +24,14 @@ struct ProfileView: View {
     // MARK: - LOGOUT ALERT
     @State private var logoutAlert: Bool = false
     
-    // MARK: - NAME VIEW
-    @State private var nameView: String = ""
     
-    var isButtonDisabled: Bool {
-        return nameView != UserDefaults.standard.userSaved?.name
-    }
+    // MARK: - CAMERA MANAGER
+    @StateObject var cameraManager = CameraManager()
+    
+    @State private var selectedImage: UIImage?
+    @State private var croppedImage: UIImage?
+    @State private var showImagePicker = false
+    @State private var showCropView = false
     
     // MARK: - BODY
     var body: some View {
@@ -48,11 +51,6 @@ extension ProfileView {
                     LazyVStack(alignment: .leading,spacing: 20) {
                         skillsView
                         informationView
-                        
-                        if isButtonDisabled {
-                            updateProfile
-                                .padding(.horizontal, Measures.kHomeHorizontalPadding)
-                        }
                         logoutButton
                             .padding(.horizontal, Measures.kHomeHorizontalPadding)
                        
@@ -97,11 +95,6 @@ extension ProfileView {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(ColorManager.bgColor)
-        .onAppear {
-            if let user = UserDefaults.standard.userSaved {
-                nameView = user.name
-            }
-        }
     }
     
     /// Header View
@@ -110,25 +103,32 @@ extension ProfileView {
         let height = Measures.kTopShapeHeightSmaller
         GeometryReader { reader in
             let minY = reader.frame(in: .named("SCROLL")).minY
-            let progress = minY / (height * (minY > 0 ? 0.5 : 0.6))
-            let dynamicHeight = max(height + (minY < 0 ? minY : 0), 0)
-            let interpolatedOpacity = max(0, min(1, 1 + progress))
-
-            ZStack(alignment: .leading) {
-              
-                topShape(dynamicHeight)
-                    .frame(height: dynamicHeight)
-
+            let dynamicHeight = max(105, max(height + (minY < 0 ? minY : 0), 0))
+            let textOffsetY = max(-22, min(0, minY * 0.2))
+            let imageOffsetY = max(-15, min(0, minY * 0.2))
+            let progressShape = min(max((minY + 70) / 40, 0), 1)
+            let imageSize = max(30, min(50, 50 + minY * 0.2))
+            ZStack(alignment: .trailing) {
+                TopShape(progress: progressShape)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: dynamicHeight, alignment: .top)
+                    .foregroundStyle(ColorManager.primaryBasicColor)
                 Text("PROFILE_HEADER".localized)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     .font(.custom(CustomFonts.bold, size: 30))
                     .foregroundStyle(ColorManager.defaultWhite)
                     .padding(.horizontal, Measures.kHomeHorizontalPadding)
-                    .opacity(interpolatedOpacity)
+                    .offset(y: -textOffsetY)
+                
+                profileImage(size: imageSize)
+                    .frame(maxWidth: 70, alignment: .leading)
+                    .padding(.horizontal, Measures.kHomeHorizontalPadding)
+                    .offset(y: -imageOffsetY)
             }
-            .opacity(interpolatedOpacity)
             .frame(maxWidth: .infinity, alignment: .leading)
             .frame(height: dynamicHeight, alignment: .top)
             .offset(y: -minY)
+
         }
         .frame(height: height)
     }
@@ -144,7 +144,7 @@ extension ProfileView {
     
     /// Custom Row View
     @ViewBuilder
-    private func rowView(name: String, text: String, udText: String, isName: Bool = false) -> some View {
+    private func rowView(name: String, text: String, udText: String) -> some View {
         VStack(alignment: .leading, spacing: 5) {
             HStack(spacing: 10) {
                 Image(systemName: name)
@@ -153,25 +153,12 @@ extension ProfileView {
                     .font(.custom(CustomFonts.regular, size: 18))
                     .foregroundStyle(ColorManager.primaryGrayColor.opacity(0.6))
             }
-            if isName {
-                TextField("", text: $nameView)
-                    .font(.custom(CustomFonts.regular, size: 19))
-                    .foregroundStyle(ColorManager.defaultBlack)
-                    .background(alignment: .bottom) {
-                        Divider()
-                    }
-                    .overlay(alignment: .trailing) {
-                        Image(systemName: "pencil")
-                            .renderingMode(.template)
-                            .padding(.trailing, 5)
-                            .foregroundStyle(ColorManager.defaultBlack)
-                    }
-            } else {
+
                 Text(udText)
                     .font(.custom(CustomFonts.regular, size: 19))
                     .foregroundStyle(ColorManager.defaultBlack)
                 Divider()
-            }
+            
         }
     }
     
@@ -229,36 +216,99 @@ extension ProfileView {
                 Text("PROFILE_YOUR_INFORMATION".localized)
                     .font(.custom(CustomFonts.bold, size: 25))
                     .foregroundStyle(ColorManager.primaryGrayColor)
-                rowView(name: "person.fill", text: "NAME".localized, udText: "\(profileSaved.name)", isName: true)
+                rowView(name: "person.fill", text: "NAME".localized, udText: "\(profileSaved.name)")
                 rowView(name: "envelope.fill", text: "LOGIN_EMAIL".localized, udText: profileSaved.email)
                 rowView(name: "map.fill", text: "LOCALITY".localized, udText: "\(profileSaved.locality), \(profileSaved.province)")
             }
             .padding(.horizontal, Measures.kHomeHorizontalPadding)
         }
     }
-    
-    /// Loogut button
+
     @ViewBuilder
-    private var updateProfile: some View {
+    private func profileImage(size: CGFloat) -> some View {
         Button {
-            Task {
-                try await databaseManager.updateUser(name: nameView)
-            }
+            showImagePicker = true
         } label: {
-            HStack {
-                Image(systemName: "pencil.line")
-                    .foregroundStyle(ColorManager.primaryBasicColor)
-                Text("PROFILE_UPDATE_PROFILE".localized)
-                    .font(.custom(CustomFonts.regular, size: 19))
-                    .foregroundStyle(ColorManager.primaryBasicColor)
+            profileImageView(size: size, image: croppedImage ?? UIImage(named: "noProfileIcon"))
+        }
+        .sheet(isPresented: $showImagePicker) {
+            ImagePicker(selectedImage: $selectedImage, sourceType: .photoLibrary)
+        }
+        .fullScreenCover(isPresented: $showCropView) {
+            if let image = selectedImage {
+                CropImageView(uiImage: image) { cropped in
+                    self.croppedImage = cropped
+                    showCropView = false
+                }
             }
-            .padding(.vertical, 7)
-            .frame(maxWidth: .infinity)
-            .overlay {
-                RoundedRectangle(cornerRadius: 10)
-                    .stroke(lineWidth: 1)
-                    .foregroundStyle(ColorManager.primaryBasicColor)
+        }
+        .onChange(of: croppedImage) {
+            if let croppedImage {
+                databaseManager.loading = true
+                Task {
+                    defer { databaseManager.loading = false}
+                    if let url = await CloudinaryManager.shared.uploadImage(image: croppedImage) {
+                        do {
+                            try await databaseManager.uploadUserDefaultsUserImage(imageURL: url)
+                            try await databaseManager.updateFirestoreImage(imageURL: url)
+                            try await databaseManager.updateFirestoreImageSkill(imageURL: url)
+                            print("Updated image in Firestore and UserDefaults")
+                        } catch {
+                            print("Error updating image in firesotre or UserDefaults: \(error.localizedDescription)")
+                        }
+                    } else {
+                        print("Error Updating to Cloduinary")
+                    }
+                }
             }
+        }
+        .onChange(of: selectedImage) {
+            if selectedImage != nil {
+                showCropView = true
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func profileImageView(size: CGFloat, image: UIImage?) -> some View {
+        // 1. If cropped image we show cropped image
+        if let croppedImage = croppedImage {
+            Image(uiImage: croppedImage)
+                .resizable()
+                .frame(width: size + 20, height: size + 20)
+                .background(ColorManager.defaultWhite)
+                .clipShape(Circle())
+                .shadow(color: ColorManager.primaryGrayColor.opacity(0.5), radius: 3, x: 2, y: 3)
+        // 2. If image save we show image save
+        } else if let userImage = UserDefaults.standard.userSaved?.profileImageURL, let url = URL(string: userImage) {
+            WebImage(url: url) { phase in
+                switch phase {
+                case .empty:
+                    ProgressView()
+                case .success(let image):
+                    image
+                case .failure:
+                    LoadingView()
+                @unknown default:
+                    LoadingView()
+                }
+            }
+            .resizable()
+            .frame(width: size + 20, height: size + 20)
+            .background(ColorManager.defaultWhite)
+            .clipShape(Circle())
+            .shadow(color: ColorManager.primaryGrayColor.opacity(0.5), radius: 3, x: 2, y: 3)
+
+            
+        // 3. If no image
+        } else {
+            Image(uiImage: image ?? UIImage())
+                .resizable()
+                .frame(width: croppedImage != nil ? size + 20 : size, height: croppedImage != nil ? size + 20 : size)
+                .padding(croppedImage != nil ? 0 : 10)
+                .background(ColorManager.defaultWhite)
+                .clipShape(Circle())
+                .shadow(color: ColorManager.primaryGrayColor.opacity(0.5), radius: 3, x: 2, y: 3)
         }
     }
 }
@@ -268,6 +318,7 @@ struct ProfileView_Previews: PreviewProvider {
     static var previews: some View {
         let mockManager = FSDatabaseManager()
         UserDefaults.standard.userSaved = User.sampleUser
+     //   mockManager.skillsSaved = Skill.sampleArray
         return GeometryReader { proxy in
             ProfileView(proxy: proxy)
                 .environment(AuthenticatorManager())

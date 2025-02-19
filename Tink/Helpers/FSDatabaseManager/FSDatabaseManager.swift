@@ -13,6 +13,8 @@ import AuthenticationServices
 import CryptoKit
 import FirebaseFirestore
 import Combine
+import FirebaseStorage
+import Cloudinary
 
 @MainActor
 @Observable
@@ -71,18 +73,21 @@ class FSDatabaseManager: ObservableObject {
                    let community = userData["community"] as? String,
                    let province = userData["province"] as? String,
                    let locality = userData["locality"] as? String,
+                   let imageUrl = userData["profileImageURL"] as? String,
                    !community.isEmpty {
                     goCompleteProfile = false
                     
                     // Store userdefault usersaved data
                     if UserDefaults.standard.userSaved == nil {
+                        
                         UserDefaults.standard.userSaved = User(
                             id: user.uid,
                             name: name,
                             email: email,
                             community: community,
                             province: province ,
-                            locality: locality
+                            locality: locality,
+                            profileImageURL: imageUrl
                         )
                     }
                     print("✅ User has a valid DNI")
@@ -107,6 +112,7 @@ class FSDatabaseManager: ObservableObject {
     /// Create new user
     func createNewUser(name: String, surname: String, community: String, province: String, locality: String) async throws {
         loading = true
+        defer { loading = false }
         guard let user = Auth.auth().currentUser else {
             print("No user authenticated")
             return
@@ -160,70 +166,6 @@ class FSDatabaseManager: ObservableObject {
         } catch {
             print("❌ Firestore error: \(error.localizedDescription)")
         }
-        loading = false
-    }
-    
-    /// Update User
-    func updateUser(name: String) async throws {
-        loading = true
-        defer {
-            loading = false
-        }
-        
-        // 1. Verify if user is authenticated
-        guard let user = UserDefaults.standard.userSaved else {
-            print("No user authenticated")
-            return
-        }
-        
-        // 2. Reference to user document based on user ID
-        let db = Firestore.firestore()
-        let userRef = db.collection("users").document(user.id)
-        
-        do {
-            // 3. Codify user
-            let userData: [String: Any] = [
-                "name": name // Solo se actualiza el campo "name"
-            ]
-            
-            // 4. Update Firestore
-            try await userRef.setData(userData, merge: true)
-            
-            // 5. Update in UserDefaults
-            if var savedUser = UserDefaults.standard.userSaved {
-                savedUser.name = name
-                UserDefaults.standard.userSaved = savedUser
-            }
-            print("✅ Updated user in firestore: \(name)")
-            try await updateSkillsForUser(userId: user.id, newName: name)
-            withAnimation(.easeInOut(duration: 0.2)) {
-                self.goCompleteProfile = false
-            }
-            
-        } catch {
-            throw NSError(domain: "FirestoreError", code: 500, userInfo: [
-                NSLocalizedDescriptionKey: "Error updating user in Firestore: \(error.localizedDescription)"
-            ])
-        }
-    }
-    
-    /// Update skills for user
-    func updateSkillsForUser(userId: String, newName: String) async throws {
-        let db = Firestore.firestore()
-        
-        // 1. Obtain skills based on ID
-        let skillsQuery = db.collection("skills").whereField("user.id", isEqualTo: userId)
-        let snapshot = try await skillsQuery.getDocuments()
-        
-        for document in snapshot.documents {
-            Task.detached {
-                let skillRef = db.collection("skills").document(document.documentID)
-                try await skillRef.updateData([
-                    "user.name": newName
-                ])
-            }
-        }     
-        print("✅ User skills from user: \(userId) Updated with : \(newName)")
     }
     
     /// Function to create new skills
@@ -268,10 +210,10 @@ class FSDatabaseManager: ObservableObject {
                 } else {
                     
                     self.skillsSaved.append(newSkill)
+                    self.allSkillsSaved.append(newSkill)
                     print("✅ New skill added to Firestore with ID: \(newSkill.id)")
                 }
             }
-            try await syncSkills()
             currentIndex = 0
         } catch {
             throw NSError(domain: "FirestoreError", code: 500, userInfo: [NSLocalizedDescriptionKey: "Error adding skill to Firestore: \(error.localizedDescription)"])
@@ -372,12 +314,81 @@ class FSDatabaseManager: ObservableObject {
             if let index = self.skillsSaved.firstIndex(where: { $0.id == skill.id }) {
                 self.skillsSaved.remove(at: index)
             }
+            
             currentIndex = 0
             print("🗑️ Skill deleted from Firestore: \(skill.id)")
         } catch {
             throw NSError(domain: "FirestoreError", code: 500, userInfo: [
                 NSLocalizedDescriptionKey: "Error deleting skill in Firestore: \(error.localizedDescription)"
             ])
+        }
+    }
+}
+
+
+extension FSDatabaseManager {
+    
+    func uploadUserDefaultsUserImage(imageURL: String) async throws {
+        guard var userSaved = UserDefaults.standard.userSaved else {
+            print("No hay usuario guardado")
+            return
+        }
+        
+        userSaved.profileImageURL = imageURL
+        UserDefaults.standard.userSaved = userSaved
+    }
+    
+    func updateFirestoreImage(imageURL: String) async throws {
+        guard let user = UserDefaults.standard.userSaved else {
+            throw NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "No se encontró el usuario en UserDefaults."])
+        }
+        
+        let db = Firestore.firestore()
+        let userRef = db.collection("users").document(user.id)
+        
+        // Crear un objeto usuario con el campo actualizado (con el imageURL)
+        var updatedUser = user  // Asumiendo que 'user' es un objeto tipo User
+        updatedUser.profileImageURL = imageURL  // Aquí se actualiza el URL de la imagen
+        
+        // Codificar el objeto usuario usando Firestore.Encoder()
+        let encodedUser = try Firestore.Encoder().encode(updatedUser)
+        
+        do {
+            // Usamos setData para actualizar el documento con la codificación
+            try await userRef.setData(encodedUser, merge: true)  // merge: true para evitar sobreescribir otros campos
+            print("Imagen de usuario actualizada exitosamente")
+        } catch {
+            print("Error al actualizar la imagen del usuario: \(error.localizedDescription)")
+            throw error  // Lanzar el error para manejarlo en el llamador
+        }
+    }
+    
+    /// Update skills
+    func updateFirestoreImageSkill(imageURL: String) async throws {
+        guard let user = UserDefaults.standard.userSaved else {
+            throw NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "No se encontró el usuario en UserDefaults."])
+        }
+        let db = Firestore.firestore()
+        do {
+            let skillsQuerySnapshot = try await db.collection("skills")
+                .whereField("user.id", isEqualTo: user.id)
+                .getDocuments()
+            
+            for document in skillsQuerySnapshot.documents {
+                let skillRef = db.collection("skills").document(document.documentID)
+                
+                await MainActor.run {
+                    skillRef.updateData(["user.profileImageURL": imageURL]) { error in
+                        if let error = error {
+                            print("❌ Error al actualizar imagen en skill \(document.documentID): \(error.localizedDescription)")
+                        } else {
+                            print("✅ Imagen actualizada en skill \(document.documentID)")
+                        }
+                    }
+                }
+            }
+        } catch {
+            print("Erro updating skills")
         }
     }
 }

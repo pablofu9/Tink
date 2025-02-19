@@ -12,7 +12,8 @@ struct TinkApp: App {
     
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     @State private var authenticatorManager: AuthenticatorManager
-    @StateObject private var databaseManager = FSDatabaseManager() 
+    @StateObject private var databaseManager = FSDatabaseManager()
+    
     init() {
         _authenticatorManager = State(wrappedValue: AuthenticatorManager())
     }
