@@ -50,8 +50,9 @@ struct SettingsView: View {
     @State private var croppedImage: UIImage?
     @State private var showImagePicker = false
     @State private var showCropView = false
-    @State private var showImageSourceActionSheet: Bool = false
+    @Binding var showImageSourceActionSheet: Bool
     @State private var imageSource: UIImagePickerController.SourceType = .photoLibrary
+    @Binding  var showImageBig: Bool
     
     // MARK: - LOGOUT ALERT
     @State private var logoutAlert: Bool = false
@@ -67,6 +68,9 @@ struct SettingsView: View {
     
     // MARK: - OPEN EDIT PROFILE
     @State private var openEditProfile: Bool = false
+    
+    // MARK: - NAMESPACE
+    let nameSpace: Namespace.ID
     
     // MARK: - BODY
     var body: some View {
@@ -119,7 +123,7 @@ struct SettingsView: View {
                 .safeAreaTopPadding(proxy: proxy)
                 .safeAreaInset(edge: .bottom) {
                     EmptyView()
-                        .frame(height: Measures.kTabBarHeight + 90)
+                        .frame(height: UIScreen.main.bounds.size.height < 700 ?  Measures.kTabBarHeight - 20:  Measures.kTabBarHeight + 90)
                 }
                 .safeAreaInset(edge: .top) {
                     EmptyView()
@@ -178,27 +182,46 @@ struct SettingsView: View {
 
 extension SettingsView {
     
+    /// Header View
     @ViewBuilder
     private var headerView: some View {
         let height = Measures.kTopShapeHeight + 50
         GeometryReader { reader in
             let minY = reader.frame(in: .named("SCROLL")).minY
             let dynamicHeight = max(105, max(height + (minY < 0 ? minY : 0), 0))
-            let imageOffsetY = max(0, min(0, minY * 0.2))
+            let imageOffsetY = max(-10, min(0, minY * 0.2))
             let imageOffsetX = max(0, min(120, minY * -1))
             let progressShape = min(max((minY + 70) / 40, 0), 1)
-
-            let imageSize = max(60, min(90, 90 + minY * 0.2))
+            let imageSize = max(35, min(90, 90 + minY * 0.35))
+            let progress = minY / (height * (minY > 0 ? 0.5 : 0.6))
+            let interpolatedOpacity = max(0, min(1, 1 + progress))
+            let invertedOpacity = 1 - interpolatedOpacity
             ZStack {
                 TopShape(progress: progressShape)
                     .frame(maxWidth: .infinity)
                     .frame(height: dynamicHeight, alignment: .top)
                     .foregroundStyle(ColorManager.primaryBasicColor)
+                if !showImageBig {
                     profileImage(size: imageSize)
+                        .matchedGeometryEffect(id: "image", in: nameSpace)
+                        .transition(.scale(scale: 1))
                         .frame(maxWidth: 70, alignment: .center)
                         .padding(.horizontal, Measures.kHomeHorizontalPadding)
                         .offset(x: imageOffsetX,y: -imageOffsetY)
-                
+                }
+                if let user = UserDefaults.standard.userSaved {
+                    Text(user.name)
+                        .padding(.leading, Measures.kHomeHorizontalPadding)
+                        .padding(.trailing, UIScreen.main.bounds.size.width / 2.5)
+                        .font(.custom(CustomFonts.medium, size: 23))
+                        .foregroundStyle(ColorManager.defaultWhite)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .opacity(invertedOpacity)
+                        .offset(y: -imageOffsetY + 10)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.9)
+
+                }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .frame(height: dynamicHeight, alignment: .top)
@@ -207,10 +230,13 @@ extension SettingsView {
         .frame(height: height)
     }
     
+    /// Profile Image
     @ViewBuilder
     private func profileImage(size: CGFloat) -> some View {
         Button {
-            showImageSourceActionSheet = true
+            withAnimation(.easeIn(duration: 0.4)) {
+                showImageBig = true
+            }
         } label: {
             profileImageView(size: size, image: croppedImage ?? UIImage(named: "noProfileIcon"))
         }
@@ -269,6 +295,7 @@ extension SettingsView {
         }
     }
     
+    /// Profile Image View
     @ViewBuilder
     private func profileImageView(size: CGFloat, image: UIImage?) -> some View {
         // 1. If cropped image we show cropped image
@@ -312,6 +339,7 @@ extension SettingsView {
         }
     }
     
+    /// Section View
     @ViewBuilder
     private func sectionView<Content: View>(_ headerText: String,  @ViewBuilder content: () -> Content) -> some View {
         Section {
@@ -323,6 +351,7 @@ extension SettingsView {
         }
     }
     
+    /// Row View
     @ViewBuilder
     private func rowView(_ text: String, image: ImageResource, action: @escaping () -> Void) -> some View {
         Button {
@@ -348,6 +377,7 @@ extension SettingsView {
         }
     }
     
+    /// Delete Account Alert
     @ViewBuilder
     private var deleteAccNotAuth: some View {
         CustomAlert(
@@ -429,10 +459,10 @@ struct Settings_Previews: PreviewProvider {
             FSCategory(id: "2", name: "Carpintería", is_manual: true),
             FSCategory(id: "3", name: "Clases online", is_manual: false),
         ]
-        
+        UserDefaults.standard.userSaved = User.sampleUser
         mockManager.allSkillsSaved = Skill.sampleArray
         return GeometryReader { proxy in
-            SettingsView(proxy: proxy)
+            SettingsView(proxy: proxy, showImageSourceActionSheet: .constant(false), showImageBig: .constant(false), nameSpace: Namespace().wrappedValue)
                 .environment(AuthenticatorManager())
                 .environmentObject(mockManager)
                 .ignoresSafeArea()

@@ -21,13 +21,6 @@ struct ProfileView: View {
     // MARK: - CONTROL MODIFY SKILL
     @State var selectedSkillToModify: Skill?
     
-    // MARK: - CAMERA MANAGER
-    @StateObject var cameraManager = CameraManager()
-    
-    @State private var selectedImage: UIImage?
-    @State private var croppedImage: UIImage?
-    @State private var showImagePicker = false
-    @State private var showCropView = false
     
     // MARK: - BODY
     var body: some View {
@@ -79,9 +72,7 @@ extension ProfileView {
             let minY = reader.frame(in: .named("SCROLL")).minY
             let dynamicHeight = max(105, max(height + (minY < 0 ? minY : 0), 0))
             let textOffsetY = max(-22, min(0, minY * 0.2))
-            let imageOffsetY = max(-15, min(0, minY * 0.2))
             let progressShape = min(max((minY + 70) / 40, 0), 1)
-            let imageSize = max(30, min(50, 50 + minY * 0.2))
             ZStack(alignment: .trailing) {
                 TopShape(progress: progressShape)
                     .frame(maxWidth: .infinity)
@@ -93,11 +84,6 @@ extension ProfileView {
                     .foregroundStyle(ColorManager.defaultWhite)
                     .padding(.horizontal, Measures.kHomeHorizontalPadding)
                     .offset(y: -textOffsetY)
-                
-                profileImage(size: imageSize)
-                    .frame(maxWidth: 70, alignment: .leading)
-                    .padding(.horizontal, Measures.kHomeHorizontalPadding)
-                    .offset(y: -imageOffsetY)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .frame(height: dynamicHeight, alignment: .top)
@@ -136,7 +122,6 @@ extension ProfileView {
         }
     }
     
-    
     /// Skills view
     @ViewBuilder
     private var skillsView: some View {
@@ -174,93 +159,6 @@ extension ProfileView {
         }
     }
 
-    @ViewBuilder
-    private func profileImage(size: CGFloat) -> some View {
-        Button {
-            showImagePicker = true
-        } label: {
-            profileImageView(size: size, image: croppedImage ?? UIImage(named: "noProfileIcon"))
-        }
-        .sheet(isPresented: $showImagePicker) {
-            ImagePicker(selectedImage: $selectedImage, sourceType: .photoLibrary)
-        }
-        .fullScreenCover(isPresented: $showCropView) {
-            if let image = selectedImage {
-                CropImageView(uiImage: image) { cropped in
-                    self.croppedImage = cropped
-                    showCropView = false
-                }
-            }
-        }
-        .onChange(of: croppedImage) {
-            if let croppedImage {
-                databaseManager.loading = true
-                Task {
-                    defer { databaseManager.loading = false}
-                    if let url = await CloudinaryManager.shared.uploadImage(image: croppedImage) {
-                        do {
-                            try await databaseManager.uploadUserDefaultsUserImage(imageURL: url)
-                            try await databaseManager.updateFirestoreImage(imageURL: url)
-                            try await databaseManager.updateFirestoreImageSkill(imageURL: url)
-                            print("Updated image in Firestore and UserDefaults")
-                        } catch {
-                            print("Error updating image in firesotre or UserDefaults: \(error.localizedDescription)")
-                        }
-                    } else {
-                        print("Error Updating to Cloduinary")
-                    }
-                }
-            }
-        }
-        .onChange(of: selectedImage) {
-            if selectedImage != nil {
-                showCropView = true
-            }
-        }
-    }
-    
-    @ViewBuilder
-    private func profileImageView(size: CGFloat, image: UIImage?) -> some View {
-        // 1. If cropped image we show cropped image
-        if let croppedImage = croppedImage {
-            Image(uiImage: croppedImage)
-                .resizable()
-                .frame(width: size + 20, height: size + 20)
-                .background(ColorManager.defaultWhite)
-                .clipShape(Circle())
-                .shadow(color: ColorManager.primaryGrayColor.opacity(0.5), radius: 3, x: 2, y: 3)
-        // 2. If image save we show image save
-        } else if let userImage = UserDefaults.standard.userSaved?.profileImageURL, let url = URL(string: userImage) {
-            WebImage(url: url) { phase in
-                switch phase {
-                case .empty:
-                    ProgressView()
-                case .success(let image):
-                    image
-                case .failure:
-                    LoadingView()
-                @unknown default:
-                    LoadingView()
-                }
-            }
-            .resizable()
-            .frame(width: size + 20, height: size + 20)
-            .background(ColorManager.defaultWhite)
-            .clipShape(Circle())
-            .shadow(color: ColorManager.primaryGrayColor.opacity(0.5), radius: 3, x: 2, y: 3)
-
-            
-        // 3. If no image
-        } else {
-            Image(uiImage: image ?? UIImage())
-                .resizable()
-                .frame(width: croppedImage != nil ? size + 20 : size, height: croppedImage != nil ? size + 20 : size)
-                .padding(croppedImage != nil ? 0 : 10)
-                .background(ColorManager.defaultWhite)
-                .clipShape(Circle())
-                .shadow(color: ColorManager.primaryGrayColor.opacity(0.5), radius: 3, x: 2, y: 3)
-        }
-    }
 }
 
 

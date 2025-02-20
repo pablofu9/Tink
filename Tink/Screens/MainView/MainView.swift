@@ -22,6 +22,11 @@ struct MainView: View {
     @State private var activeTab: TabModel = .home
     @State private var isMiddlePressed: Bool = false
     @EnvironmentObject var databaseManager: FSDatabaseManager
+    @State var showImageView: Bool = false
+    @State var showImageSourceActionSheet: Bool = false
+
+    // MARK: - MATCHED GEOMETRY EFFECT
+    @Namespace var animation
     
     var body: some View {
         content
@@ -31,6 +36,34 @@ struct MainView: View {
             .overlay {
                 if databaseManager.loading {
                     LoadingView()
+                }
+            }
+            .overlay {
+                if showImageView {
+                    if let imageURL = UserDefaults.standard.userSaved?.profileImageURL {
+                        FullImageView(image: imageURL, editAction: {
+                            withAnimation(.easeIn(duration: 0.3)) {
+                                showImageView = false
+                                showImageSourceActionSheet = true
+                            }
+                        }, backAction: {
+                            withAnimation(.easeIn(duration: 0.3)) {
+                                showImageView = false
+                            }
+                        }, nameSpace: animation)
+                    } else {
+                        FullImageView(image: nil, editAction: {
+                            withAnimation {
+                                showImageView = false
+                                showImageSourceActionSheet = true
+                            }
+                        }, backAction: {
+                            withAnimation {
+                                showImageView = false
+                            }
+                        }, nameSpace: animation)
+                    }
+                
                 }
             }
     }
@@ -46,7 +79,7 @@ extension MainView {
         case .home:
             HomeView(proxy: proxy)
         case .settings:
-            SettingsView(proxy: proxy)
+            SettingsView(proxy: proxy, showImageSourceActionSheet: $showImageSourceActionSheet, showImageBig: $showImageView, nameSpace: animation)
         case .chat:
             EmptyView()
         case .profile:
