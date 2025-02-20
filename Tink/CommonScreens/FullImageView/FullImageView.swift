@@ -20,7 +20,12 @@ struct FullImageView: View {
     
     var body: some View {
         ZStack {
-            ColorManager.primaryBasicColor
+            ZStack {
+                Rectangle()
+                    .fill( ColorManager.primaryBasicColor.opacity(0.95))
+                    .ignoresSafeArea()
+            }
+
             if let image ,let url = URL(string: image) {
                 WebImage(url: url) { phase in
                     switch phase {

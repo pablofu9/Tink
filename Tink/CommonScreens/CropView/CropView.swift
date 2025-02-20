@@ -55,7 +55,7 @@ struct CropImageView: View {
         ZStack(alignment: .center) {
             ZStack {
                 Rectangle()
-                    .fill(.ultraThickMaterial)
+                    .fill(.ultraThinMaterial)
                     .ignoresSafeArea()
                 Image(uiImage: uiImage)
                     .resizable()
@@ -68,7 +68,7 @@ struct CropImageView: View {
                     .scaleEffect(scale)
                     .offset(offset)
             }
-            .blur(radius: 20)
+            .blur(radius: 10)
             
             Image(uiImage: uiImage)
                 .resizable()
