@@ -21,10 +21,6 @@ struct ProfileView: View {
     // MARK: - CONTROL MODIFY SKILL
     @State var selectedSkillToModify: Skill?
     
-    // MARK: - LOGOUT ALERT
-    @State private var logoutAlert: Bool = false
-    
-    
     // MARK: - CAMERA MANAGER
     @StateObject var cameraManager = CameraManager()
     
@@ -51,9 +47,6 @@ extension ProfileView {
                     LazyVStack(alignment: .leading,spacing: 20) {
                         skillsView
                         informationView
-                        logoutButton
-                            .padding(.horizontal, Measures.kHomeHorizontalPadding)
-                       
                     }
                     .safeAreaInset(edge: .top) {
                         EmptyView()
@@ -73,25 +66,6 @@ extension ProfileView {
         }
         .sheet(item: $selectedSkillToModify) { skill in
             NewSkillView(isMiddlePressed: .constant(false), skill: skill)
-        }
-        .overlay {
-            if logoutAlert {
-                CustomAlert(
-                    title: "SETTINGS_LOGOUT".localized,
-                    bodyText: "ALERT_LOGOUT_BODY".localized,
-                    acceptAction: {
-                        Task {
-                            try authenticatorManager.signOut()
-                        }
-                    },
-                    cancelAction: {
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            logoutAlert = false
-                        }
-                    }
-                )
-                .transition(.asymmetric(insertion: .move(edge: .top).combined(with: .opacity), removal: .opacity))
-            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(ColorManager.bgColor)
@@ -162,30 +136,6 @@ extension ProfileView {
         }
     }
     
-    /// Loogut button
-    @ViewBuilder
-    private var logoutButton: some View {
-        Button {
-            withAnimation(.easeInOut(duration: 0.3)) {
-                logoutAlert = true
-            }
-        } label: {
-            HStack {
-                Image(systemName: "door.left.hand.open")
-                    .foregroundStyle(ColorManager.cancelColor)
-                Text("SETTINGS_LOGOUT".localized)
-                    .font(.custom(CustomFonts.regular, size: 19))
-                    .foregroundStyle(ColorManager.cancelColor)
-            }
-            .padding(.vertical, 7)
-            .frame(maxWidth: .infinity)
-            .overlay {
-                RoundedRectangle(cornerRadius: 10)
-                    .stroke(lineWidth: 1)
-                    .foregroundStyle(ColorManager.cancelColor)
-            }
-        }
-    }
     
     /// Skills view
     @ViewBuilder

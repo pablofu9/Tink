@@ -73,28 +73,30 @@ class FSDatabaseManager: ObservableObject {
                    let community = userData["community"] as? String,
                    let province = userData["province"] as? String,
                    let locality = userData["locality"] as? String,
-                   let imageUrl = userData["profileImageURL"] as? String,
                    !community.isEmpty {
+                    
                     goCompleteProfile = false
                     
-                    // Store userdefault usersaved data
+                    // ⚡ Hacemos `imageUrl` opcional
+                    let imageUrl = userData["profileImageURL"] as? String ?? nil
+                    
+                    // Store user in UserDefaults if not already saved
                     if UserDefaults.standard.userSaved == nil {
-                        
                         UserDefaults.standard.userSaved = User(
                             id: user.uid,
                             name: name,
                             email: email,
                             community: community,
-                            province: province ,
+                            province: province,
                             locality: locality,
-                            profileImageURL: imageUrl
+                            profileImageURL: imageUrl // ✅ Se asigna solo si existe
                         )
                     }
-                    print("✅ User has a valid DNI")
+                    print("✅ User has a valid profile")
                 } else {
                     withAnimation(.easeInOut(duration: 0.3)) {
                         goCompleteProfile = true
-                        print("⚠️ User needs to complete DNI")
+                        print("⚠️ User needs to complete required profile fields")
                     }
                 }
                            
@@ -323,9 +325,36 @@ class FSDatabaseManager: ObservableObject {
             ])
         }
     }
+    
+    func deleteAccount() async throws {
+        guard let user = UserDefaults.standard.userSaved else {
+            return
+        }
+        let firestore = Firestore.firestore()
+        
+         do {
+             // 1. Remove user from users
+             try await firestore.collection("users").document(user.id).delete()
+             
+             // 2. Remove skills where user.id == user.id
+             let skillsQuery = try await firestore.collection("skills")
+                 .whereField("user.id", isEqualTo: user.id)
+                 .getDocuments()
+             
+             for document in skillsQuery.documents {
+                 try await firestore.collection("skills").document(document.documentID).delete()
+             }
+             
+             print("Skills and account deleted")
+         } catch {
+             print("Error deleting account: \(error.localizedDescription)")
+             throw error
+         }
+     
+    }
 }
 
-
+// MARK: - IMAGE MANAGEMENT
 extension FSDatabaseManager {
     
     func uploadUserDefaultsUserImage(imageURL: String) async throws {
@@ -391,6 +420,9 @@ extension FSDatabaseManager {
             print("Erro updating skills")
         }
     }
+    
+    
+
 }
 
 // MOCK FOR PREVIEWS

@@ -117,14 +117,55 @@ class AuthenticatorManager: NSObject, ASAuthorizationControllerDelegate {
         authErrorResetPass = nil
     }
     
-    func updateUserDefaultsProfile(name: String, image: String) {
-        UserDefaults.standard.profileName = name
-        UserDefaults.standard.profileImage = image
-    }
-    
+    /// Reset profile
     func resetProfile() {
         UserDefaults.standard.userSaved = nil
     }
+    
+    /// Delete account
+    func deleteAccount() async throws {
+        guard let user = Auth.auth().currentUser else { return }
+        do {
+            try await user.delete()
+            print("Account deleted from firebase with success!!")
+        } catch {
+            print("Error deleting account: \(error.localizedDescription)")
+        }
+    }
+    
+    func getProvider() async throws -> ProviderResult? {
+        var provider: ProviderResult?
+        if let user = Auth.auth().currentUser {
+            for data in user.providerData {
+                switch data.providerID {
+                case "password":
+                    provider = .email
+                case "google.com":
+                    provider = .google
+                case "apple.com":
+                    provider = .apple
+                default:
+                    provider = .email
+                }
+            }
+           
+        }
+        return provider
+    }
+    
+    func reauthenticate(password: String, completion: @escaping (Result<Bool, Error>) -> Void) {
+        if let user = Auth.auth().currentUser {
+            let credential = EmailAuthProvider.credential(withEmail: user.email ?? "", password: password)
+            user.reauthenticate(with: credential) { _, error in
+                if let error = error {
+                    completion(.failure(error))
+                } else {
+                    completion(.success(true))
+                }
+            }
+        }
+    }
+        
 }
 
 // MARK: - GOOGLE AUTH
@@ -140,12 +181,7 @@ extension AuthenticatorManager {
         guard let idToken = result.user.idToken?.tokenString else { return }
         let accessToken = result.user.accessToken.tokenString
         let credential = GoogleAuthProvider.credential(withIDToken: idToken, accessToken: accessToken)
-        
         try await Auth.auth().signIn(with: credential)
-        let userProfile = result.user.profile
-        let userName = userProfile?.name
-        let profileImageURL = userProfile?.imageURL(withDimension: 200)
-        updateUserDefaultsProfile(name: userName ?? "", image: (profileImageURL?.absoluteString ?? ""))
     }
 }
 
@@ -239,4 +275,10 @@ extension AuthenticatorManager {
 extension AuthenticatorManager {
     
 
+}
+
+enum ProviderResult {
+    case email
+    case google
+    case apple
 }

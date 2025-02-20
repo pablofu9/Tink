@@ -22,8 +22,20 @@ struct AppSwitcher: View {
                 CoordinatorStack(AuthCoordinatorPages.login)
                     .transition(.move(edge: .bottom))
             } else {
-                MainView()
-                    .transition(.move(edge: .bottom))
+                if databaseManager.goCompleteProfile {
+                    CompleteProfileView()
+                        .transition(.move(edge: .bottom))
+                } else {
+                    MainView()
+                        .transition(.move(edge: .bottom))
+                }
+            }
+        }
+        .onChange(of: authenticatorManager.authState) {
+            if authenticatorManager.authState == .authenticated {
+                Task {
+                    try await databaseManager.checkIfUserExistInDatabase()
+                }
             }
         }
         .environmentObject(databaseManager)

@@ -54,8 +54,9 @@ extension CompleteProfileView {
     @ViewBuilder
     private var content: some View {
         GeometryReader { proxy in
+            blobBG(proxy)
             ScrollView {
-                LazyVStack(alignment: .leading,spacing: 20, pinnedViews: .sectionHeaders) {
+                LazyVStack(alignment: .leading,spacing: 20) {
                     Section {
                         nameView
                         surnameView
@@ -72,7 +73,7 @@ extension CompleteProfileView {
                             Text("NEED_COMPLETE_PROFILE".localized)
                         }
                         .frame(maxWidth: .infinity)
-                        .background(ColorManager.defaultWhite)
+                        .background(.clear)
                     }
                 }
             }
@@ -87,7 +88,7 @@ extension CompleteProfileView {
                 }
                 startRandomMovement()
             }
-            blobBG(proxy)
+           
         }
         .background(ColorManager.defaultWhite)
         .onTapGesture {

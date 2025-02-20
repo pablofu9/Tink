@@ -7,9 +7,8 @@
 import Foundation
 import SwiftUI
 
+/// Extension to fix orientation of an UIImage without EXIF
 public extension UIImage {
-    
-    /// Extension to fix orientation of an UIImage without EXIF
     func fixOrientation(og: UIImage) -> UIImage {
         
         switch og.imageOrientation {

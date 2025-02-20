@@ -25,11 +25,6 @@ struct MainView: View {
     
     var body: some View {
         content
-            .onAppear {
-                Task {
-                    try await databaseManager.checkIfUserExistInDatabase()
-                }
-            }
             .fullScreenCover(isPresented: $isMiddlePressed) {
                 NewSkillView(isMiddlePressed: $isMiddlePressed)
             }
@@ -51,7 +46,7 @@ extension MainView {
         case .home:
             HomeView(proxy: proxy)
         case .settings:
-            EmptyView()
+            SettingsView(proxy: proxy)
         case .chat:
             EmptyView()
         case .profile:
@@ -71,12 +66,6 @@ extension MainView {
                 .frame(maxHeight: .infinity, alignment: .bottom)
             })
             .ignoresSafeArea()
-        }
-        .overlay {
-            if databaseManager.goCompleteProfile {
-                CompleteProfileView()
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
-            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
