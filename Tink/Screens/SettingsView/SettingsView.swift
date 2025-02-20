@@ -72,6 +72,9 @@ struct SettingsView: View {
     // MARK: - NAMESPACE
     let nameSpace: Namespace.ID
     
+    // MARK: - NOTIFICATIONS
+    @State var toggleNotif: Bool = false
+    
     // MARK: - BODY
     var body: some View {
         ZStack(alignment: .top) {
@@ -100,7 +103,7 @@ struct SettingsView: View {
                     sectionView("SETTINGS_NOTIFICATIONS".localized, content: {
                         rowView("SETTINGS_ACTIVATE_NOTIFICATIONS".localized, image: .notificationsIcon, action: {
                             
-                        })
+                        }, isNotifications: true)
                     })
                     
                     sectionView("SETTINGS_TERMS_AND_SUPPORT".localized, content: {
@@ -210,7 +213,7 @@ extension SettingsView {
                         .offset(x: imageOffsetX,y: -imageOffsetY)
                 }
                 if let user = UserDefaults.standard.userSaved {
-                    Text(user.name)
+                    Text(user.name.capitalized)
                         .padding(.leading, Measures.kHomeHorizontalPadding)
                         .padding(.trailing, UIScreen.main.bounds.size.width / 2.5)
                         .font(.custom(CustomFonts.medium, size: 23))
@@ -353,7 +356,7 @@ extension SettingsView {
     
     /// Row View
     @ViewBuilder
-    private func rowView(_ text: String, image: ImageResource, action: @escaping () -> Void) -> some View {
+    private func rowView(_ text: String, image: ImageResource, action: @escaping () -> Void, isNotifications: Bool = false) -> some View {
         Button {
             action()
         } label: {
@@ -367,12 +370,19 @@ extension SettingsView {
                     .font(.custom(CustomFonts.medium, size: 17))
                     .foregroundStyle(ColorManager.primaryGrayColor.opacity(0.9))
                 Spacer()
-                Image(.backIcon)
-                    .resizable()
-                    .renderingMode(.template)
-                    .frame(width: 30, height: 30)
-                    .rotationEffect(.degrees(180))
-                    .foregroundStyle(ColorManager.primaryGrayColor.opacity(0.9))
+                if isNotifications {
+                    Toggle("", isOn: $toggleNotif)
+                        .tint(ColorManager.primaryBasicColor)
+                        .labelsHidden()
+                } else {
+                    Image(.backIcon)
+                        .resizable()
+                        .renderingMode(.template)
+                        .frame(width: 30, height: 30)
+                        .rotationEffect(.degrees(180))
+                        .foregroundStyle(ColorManager.primaryGrayColor.opacity(0.9))
+                }
+              
             }
         }
     }
