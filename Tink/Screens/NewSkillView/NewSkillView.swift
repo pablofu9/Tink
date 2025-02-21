@@ -422,6 +422,7 @@ extension NewSkillView {
     
     func initialyseModifyView() {
         if let skill {
+            print("category: \(skill.category)")
             skillName = skill.name
             skillDescription = skill.description
             let numericPart = skill.price.components(separatedBy: CharacterSet.decimalDigits.inverted).joined()

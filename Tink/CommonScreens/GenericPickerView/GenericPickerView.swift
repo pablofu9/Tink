@@ -29,7 +29,7 @@ struct GenericPickerView<T: Hashable & CustomStringConvertible>: View {
                         Text(option.description)
                             .font(.custom(CustomFonts.bold, size: 12))
                             .foregroundStyle(ColorManager.primaryGrayColor)
-                            .tag(option)
+                            .tag(option as T?) // Forzar el tipo
                     }
                 }
                 .labelsHidden()
