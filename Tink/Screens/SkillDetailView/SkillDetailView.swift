@@ -201,9 +201,12 @@ extension SkillDetailView {
     @ViewBuilder
     private var customDivider: some View {
         Rectangle()
+            .fill(
+                LinearGradient(colors: [ColorManager.primaryBasicColor, ColorManager.primaryBasicColor.opacity(0.7), ColorManager.primaryBasicColor.opacity(0.5)], startPoint: .top, endPoint: .bottom)
+            )
             .frame(maxWidth: .infinity)
             .frame(height: 20)
-            .foregroundStyle(ColorManager.primaryBasicColor.opacity(0.4))
+           
     }
     
     /// Info View
@@ -243,7 +246,7 @@ extension SkillDetailView {
         VStack(alignment: .leading, spacing: 5) {
             HStack {
                 Text(header)
-                    .font(.custom(CustomFonts.bold, size: 16))
+                    .font(.custom(CustomFonts.medium, size: 16))
                     .foregroundStyle(ColorManager.primaryGrayColor)
                 Spacer()
                 if let icon {
@@ -276,38 +279,45 @@ extension SkillDetailView {
     /// User Info View
     @ViewBuilder
     private func userInfoView(_ header: String) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 5) {
+            
             Text(header)
                 .font(.custom(CustomFonts.regular, size: 15))
                 .foregroundStyle(ColorManager.primaryGrayColor.opacity(0.7))
             HStack {
                 Text(skill.user.name)
-                    .font(.custom(CustomFonts.bold, size: 16))
+                    .font(.custom(CustomFonts.medium, size: 16))
                     .foregroundStyle(ColorManager.primaryGrayColor)
                 Spacer()
                 imageProfile
             }
             Text(skill.user.email)
-                .font(.custom(CustomFonts.bold, size: 16))
+                .font(.custom(CustomFonts.medium, size: 16))
                 .foregroundStyle(ColorManager.primaryGrayColor)
             Button {
                 
             } label: {
                 Text("SKILL_DETAIL_WRITE_MESSAGE".localized)
-                    .foregroundStyle(ColorManager.primaryBasicColor)
+                    .foregroundStyle(ColorManager.defaultWhite)
                     .font(.custom(CustomFonts.medium, size: 17))
                
             }
-            .padding(7)
+            .padding(10)
             .background {
                 RoundedRectangle(cornerRadius: 10)
-                    .stroke(lineWidth: 2)
                     .foregroundStyle(ColorManager.primaryBasicColor)
             }
+            .overlay {
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(lineWidth: 1)
+                    .foregroundStyle(ColorManager.primaryGrayColor)
+            }
+            .padding(.vertical, 10)
         }
         .padding(.horizontal, Measures.kHomeHorizontalPadding)
     }
     
+    /// Profile Image
     @ViewBuilder
     private var imageProfile: some View {
         if let userImage = skill.user.profileImageURL, let url = URL(string: userImage) {
@@ -324,14 +334,14 @@ extension SkillDetailView {
                 }
             }
             .resizable()
-            .frame(width: 70, height: 70)
+            .frame(width: 55, height: 55)
             .background(ColorManager.defaultWhite)
             .clipShape(Circle())
             .shadow(color: ColorManager.primaryGrayColor.opacity(0.5), radius: 3, x: 2, y: 3)
         } else {
             Image(.noProfileIcon)
                 .resizable()
-                .frame(width: 60, height: 60)
+                .frame(width: 45, height: 45)
                 .padding(10)
                 .background(ColorManager.defaultWhite)
                 .clipShape(Circle())

@@ -71,6 +71,8 @@ extension SkillRowView {
             .padding(.horizontal, 10)
             .padding(.vertical, 1)
             .background(ColorManager.primaryBasicColor)
+            .lineLimit(1)
+            .minimumScaleFactor(0.8)
             .clipShape(Capsule())
             .overlay {
                 Capsule()

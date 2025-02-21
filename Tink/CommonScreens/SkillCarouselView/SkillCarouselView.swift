@@ -9,17 +9,17 @@ import SwiftUI
 
 struct SkillCarouselView: View {
     
-    @Binding var selectedIndex: Int
-    @EnvironmentObject var databaseManager: FSDatabaseManager
-
+    @Binding var skills: [Skill]
+    @Binding var currentIndex: Int
+    
     var body: some View {
         VStack(spacing: 0) {
             // Carrusel con paginación
-            TabView(selection: $selectedIndex) {
-                ForEach(databaseManager.filteredSkills.indices, id: \.self) { index in
-                    SkillCardView(skill: databaseManager.filteredSkills[index])
+            TabView(selection: $currentIndex) {
+                ForEach(skills.indices, id: \.self) { index in
+                    SkillCardView(skill: $skills[index])
                         .tag(index)
-                        .id(databaseManager.filteredSkills[index].id)
+                        .id(skills[index].id)
                        
                 }
             }
@@ -28,8 +28,8 @@ struct SkillCarouselView: View {
             
             // Index pagination
             HStack {
-                ForEach(0..<databaseManager.filteredSkills.count, id: \.self) { index in
-                    if selectedIndex == index {
+                ForEach(0..<skills.count, id: \.self) { index in
+                    if currentIndex == index {
                         Capsule()
                             .frame(width: 20, height: 8)
                             .foregroundStyle(ColorManager.primaryBasicColor)
@@ -43,7 +43,7 @@ struct SkillCarouselView: View {
                     }
                 }
             }
-            .animation(.easeInOut(duration: 0.3), value: selectedIndex) // Animación con duración
+            .animation(.easeInOut(duration: 0.3), value: currentIndex) // Animación con duración
         }
         .frame(height: 320)
     }
@@ -52,7 +52,7 @@ struct SkillCarouselView: View {
 #Preview {
     @Previewable @State var selectedIndex = 0
     let mockManager = FSDatabaseManager()
-
-    SkillCarouselView(selectedIndex: $selectedIndex)
+    
+    SkillCarouselView(skills: .constant([]), currentIndex: $selectedIndex)
         .environmentObject(mockManager)
 }

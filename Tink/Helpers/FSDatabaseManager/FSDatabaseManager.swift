@@ -26,10 +26,6 @@ class FSDatabaseManager: ObservableObject {
     var skillsSaved: [Skill] = []
     var allSkillsSaved: [Skill] = []
     
-    var filteredSkills: [Skill] {
-        let userId = UserDefaults.standard.userSaved?.id
-        return skillsSaved.filter { $0.user.id == userId }
-    }
        
     // MARK: - CAROUSEL CONTROLLER
     var currentIndex: Int = 0
@@ -268,21 +264,12 @@ class FSDatabaseManager: ObservableObject {
         let skillRef = db.collection("skills").document(skill.id)
         
         do {
-            // 🔹 Codificar el objeto Skill en un diccionario seguro
+            self.skillsSaved = []
+            self.allSkillsSaved = []
             let encodedSkill = try Firestore.Encoder().encode(skill)
-            print(skill)
-            // 🔹 Actualizar Firestore con el objeto completo
-            try await skillRef.setData(encodedSkill, merge: true)
-
-            // 3. Actualizar localmente en UserDefaults (en hilo principal)
-            if let index = self.skillsSaved.firstIndex(where: { $0.id == skill.id }) {
-                self.skillsSaved[index] = skill
+            await MainActor.run {
+                skillRef.updateData(encodedSkill)
             }
-            
-            if let allIndex = self.allSkillsSaved.firstIndex(where: { $0.id == skill.id}) {
-                self.allSkillsSaved[allIndex] = skill
-            }
-                
             currentIndex = 0
             print("✅ Skill updated in Firestore: \(skill.id)")
         } catch {
@@ -326,6 +313,7 @@ class FSDatabaseManager: ObservableObject {
         }
     }
     
+    /// Delete account
     func deleteAccount() async throws {
         guard let user = UserDefaults.standard.userSaved else {
             return
@@ -351,6 +339,55 @@ class FSDatabaseManager: ObservableObject {
              throw error
          }
      
+    }
+    
+    /// Update name
+    func updateName(name: String) async throws {
+        loading = true
+        defer {
+            loading = false
+        }
+        guard let user = UserDefaults.standard.userSaved else {
+            return
+        }
+        // Database
+        let db = Firestore.firestore()
+        
+        let userReference = db.collection("users").document(user.id)
+        // Update name in database
+        do {
+            // Wait 2 seconds
+            try await Task.sleep(nanoseconds: 2_000_000_000)
+            // Get skills where user.id == user.id
+            let skillsQuerySnapshot = try await db.collection("skills")
+                .whereField("user.id", isEqualTo: user.id)
+                .getDocuments()
+            
+            await MainActor.run {
+                // Modify name in "Users" collection
+                userReference.updateData(["name": name]) { error in
+                    if let error = error {
+                        print("Error updating name: \(error.localizedDescription)")
+                    } else {
+                        UserDefaults.standard.userSaved?.name = name
+                        print("✅ Name updated")
+                    }
+                }
+                // Modify user.name in skills collection
+                for document in skillsQuerySnapshot.documents {
+                    let skillRef = db.collection("skills").document(document.documentID)
+                    skillRef.updateData(["user.name": name]) { error in
+                        if let error = error {
+                            print("Error updating name in skill \(document.documentID): \(error.localizedDescription)")
+                        } else {
+                            print("✅ Name updated in skill \(document.documentID)")
+                        }
+                    }
+                }
+            }
+        } catch {
+            print("Error updating name: \(error.localizedDescription)")
+        }
     }
 }
 

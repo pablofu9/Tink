@@ -10,7 +10,7 @@ import SDWebImageSwiftUI
 
 struct SkillCardView: View {
     
-    var skill: Skill
+    @Binding var skill: Skill
     
     // MARK: - BODY
     var body: some View {
@@ -119,5 +119,6 @@ extension SkillCardView {
 }
 
 #Preview {
-    SkillCardView(skill: Skill.sample)
+    @Previewable @State var skill: Skill = Skill.sample
+    SkillCardView(skill: $skill)
 }

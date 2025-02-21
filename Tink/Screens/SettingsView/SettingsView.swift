@@ -213,7 +213,7 @@ extension SettingsView {
                         .offset(x: imageOffsetX,y: -imageOffsetY)
                 }
                 if let user = UserDefaults.standard.userSaved {
-                    Text(user.name.capitalized)
+                    Text(user.name)
                         .padding(.leading, Measures.kHomeHorizontalPadding)
                         .padding(.trailing, UIScreen.main.bounds.size.width / 2.5)
                         .font(.custom(CustomFonts.medium, size: 23))

@@ -43,7 +43,21 @@ struct TopShape: Shape {
 }
 
 #Preview {
-    TopShape()
-        .frame(maxWidth: .infinity, maxHeight: 70)
-        .foregroundStyle(.red)
+    struct TopShapePreview: View {
+        @State private var progress: CGFloat = 1.0
+
+        var body: some View {
+            VStack {
+                TopShape(progress: progress)
+                    .frame(maxWidth: .infinity, maxHeight: Measures.kTopShapeHeight)
+                    .foregroundStyle(.red)
+                    .animation(.easeInOut(duration: 0.3), value: progress)
+                Text("\(progress)")
+                Slider(value: $progress, in: 0...1)
+                    .padding()
+            }
+        }
+    }
+
+    return TopShapePreview()
 }

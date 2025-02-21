@@ -14,11 +14,20 @@ enum EditProfileFocus {
 
 struct EditProfileView: View {
     
+    // Name view
     @State private var name: String = ""
-    @State private var email: String = ""
+    // Dismiss
     @Environment(\.dismiss) var dismiss
+    // Focus
     @FocusState var focus: EditProfileFocus?
+    // Database manager
+    @EnvironmentObject var databaseManager: FSDatabaseManager
+    // Button disabled
+    var isDisabled: Bool {
+        return name.isEmpty
+    }
     
+    // MARK: - BODY
     var body: some View {
         VStack(alignment: .leading, spacing: 30) {
             BackButton(action: {
@@ -30,7 +39,6 @@ struct EditProfileView: View {
                 .foregroundStyle(ColorManager.defaultBlack)
             LazyVStack(alignment: .leading, spacing: 35) {
                 nameView
-                emailView
                 updateButton
             }
         }
@@ -41,7 +49,11 @@ struct EditProfileView: View {
         .onAppear {
             if let user = UserDefaults.standard.userSaved {
                 name = user.name
-                email = user.email
+            }
+        }
+        .overlay {
+            if databaseManager.loading {
+                LoadingView()
             }
         }
     }
@@ -74,33 +86,33 @@ extension EditProfileView {
         }
     }
     
-    @ViewBuilder
-    private var emailView: some View {
-        VStack(alignment: .leading, spacing: 5) {
-            headerView("LOGIN_EMAIL".localized)
-            TextField("", text: $email, prompt: propmtView("LOGIN_EMAIL".localized))
-                .textFieldStyle(LoginTextField(focused: focus == .email))
-                .focused($focus, equals: .email)
-        }
-    }
     
     @ViewBuilder
     private var updateButton: some View {
         Button {
-            
+            if !name.isEmpty {
+                Task {
+                    try await databaseManager.updateName(name: name)
+                }
+            }
         } label: {
             Text("PROFILE_UPDATE_PROFILE".localized)
                 .font(.custom(CustomFonts.medium, size: 18))
                 .foregroundStyle(ColorManager.defaultWhite)
                 .frame(maxWidth: .infinity, alignment: .center)
                 .padding(.vertical, 10)
-                .background(ColorManager.primaryBasicColor)
+                .background(ColorManager.primaryBasicColor.opacity(isDisabled ? 0.5 : 1))
                 .clipShape(RoundedRectangle(cornerRadius: 10))
         }
+        .disabled(isDisabled)
         .frame(maxWidth: .infinity, alignment: .center)
     }
 }
 
+
 #Preview {
+    let mockManager = FSDatabaseManager()
     EditProfileView()
+        .environmentObject(mockManager)
+        
 }

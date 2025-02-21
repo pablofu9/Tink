@@ -57,8 +57,18 @@ extension ProfileView {
             }
             .coordinateSpace(name: "SCROLL")
         }
-        .sheet(item: $selectedSkillToModify) { skill in
+        .sheet(item: $selectedSkillToModify, onDismiss: {
+            Task {
+                databaseManager.loading = true
+                defer { databaseManager.loading = false }
+                try await Task.sleep(nanoseconds: 2_000_000_000)
+                try await databaseManager.syncSkills()
+            }
+        }) { skill in
             NewSkillView(isMiddlePressed: .constant(false), skill: skill)
+        }
+        .onDisappear {
+            databaseManager.currentIndex = 0
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(ColorManager.bgColor)
@@ -125,18 +135,18 @@ extension ProfileView {
     /// Skills view
     @ViewBuilder
     private var skillsView: some View {
-        if !databaseManager.filteredSkills.isEmpty {
+        if !databaseManager.skillsSaved.isEmpty {
             VStack(alignment: .leading, spacing: 5) {
                 Text("PROFILE_YOUR_SKILLS".localized)
                     .font(.custom(CustomFonts.bold, size: 25))
                     .foregroundStyle(ColorManager.primaryGrayColor)
                     .padding(.horizontal, Measures.kHomeHorizontalPadding)
                 Button {
-                    if databaseManager.currentIndex <= databaseManager.filteredSkills.count {
-                        selectedSkillToModify = databaseManager.filteredSkills[databaseManager.currentIndex]
+                    if databaseManager.currentIndex <= databaseManager.skillsSaved.count {
+                        selectedSkillToModify = databaseManager.skillsSaved[databaseManager.currentIndex]
                     }
                 } label: {
-                    SkillCarouselView(selectedIndex: $databaseManager.currentIndex)
+                    SkillCarouselView(skills: $databaseManager.skillsSaved, currentIndex: $databaseManager.currentIndex)
                 }
             }
         }

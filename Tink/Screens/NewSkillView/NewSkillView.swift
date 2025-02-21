@@ -312,7 +312,7 @@ extension NewSkillView {
             .foregroundStyle(ColorManager.primaryGrayColor.opacity(0.6))
     }
     
-    // Category picker
+    /// Category picker
     @ViewBuilder
     private var categoryPicker: some View {
         let filteredCategories = databaseManager.categories
@@ -364,6 +364,7 @@ extension NewSkillView {
         }
     }
     
+    /// Create or modify announce
     @ViewBuilder
     private var createAnnounce: some View {
         Button {
@@ -395,7 +396,6 @@ extension NewSkillView {
             Image(.deleteIcon)
                 .resizable()
                 .renderingMode(.template)
-            
                 .frame(width: 30, height: 35)
                 .padding(.horizontal, 20)
                 .padding(.vertical, 6)
@@ -428,7 +428,6 @@ extension NewSkillView {
             price = numericPart
             selectedCategory = skill.category
             let nonNumericPart = skill.price.components(separatedBy: CharacterSet.decimalDigits).joined()
-            print(nonNumericPart)
             if nonNumericPart.contains("€/H") {
                 selectedPrice = .eurHour
             } else {
@@ -437,7 +436,6 @@ extension NewSkillView {
             if skill.category.is_manual == nil {
                 if let isOnline = skill.is_online {
                     newSkillOnline = isOnline ? .online : .presencial
-
                 }
             }
         }
