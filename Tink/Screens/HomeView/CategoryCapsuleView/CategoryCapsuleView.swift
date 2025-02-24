@@ -20,7 +20,13 @@ struct CategoryCapsuleView: View {
         
         //  Sorted categories
         let sortedCategories = categories.sorted {
-            return $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
+            if $0.name.lowercased() == "otra" {
+                return false
+            } else if $1.name.lowercased() == "otra" {
+                return true
+            } else {
+                return $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
+            }
         }
         
         // Scroll view for categories

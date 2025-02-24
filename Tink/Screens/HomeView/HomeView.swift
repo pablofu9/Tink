@@ -54,22 +54,43 @@ struct HomeView: View {
     var body: some View {
         ZStack(alignment: .top) {
             ScrollView {
-                LazyVGrid(columns: columns, spacing: 50) {
-                    allSkillsView
-                }
-                .frame(maxHeight: .infinity, alignment: .top)
-                .padding(16)
-                .safeAreaInset(edge: .bottom) {
-                    EmptyView()
-                        .frame(height: Measures.kTabBarHeight + 70)
-                }
-                .safeAreaInset(edge: .top) {
-                    EmptyView()
-                        .frame(height: Measures.kTopShapeHeightSmaller + (filterDeploy == nil ? -30 : 0))
-                }
-                .safeAreaTopPadding(proxy: proxy)
-                .overlay(alignment: .top) {
-                    headerView(proxy)
+                if !databaseManager.allSkillsSaved.isEmpty {
+                    LazyVGrid(columns: columns, spacing: 50) {
+                        allSkillsView
+                    }
+                    .frame(maxHeight: .infinity, alignment: .top)
+                    .padding(16)
+                    .safeAreaInset(edge: .bottom) {
+                        EmptyView()
+                            .frame(height: Measures.kTabBarHeight + 70)
+                    }
+                    .safeAreaInset(edge: .top) {
+                        EmptyView()
+                            .frame(height: Measures.kTopShapeHeightSmaller + (filterDeploy == nil ? -30 : 0))
+                    }
+                    .safeAreaTopPadding(proxy: proxy)
+                    .overlay(alignment: .top) {
+                        headerView(proxy)
+                    }
+                   
+                } else {
+                    LazyVStack {
+                        EmptyContentView(title: "EMPTY_SKILLS".localized, image: .emptyIcon)
+                    }
+                    .frame(maxHeight: .infinity, alignment: .top)
+                    .padding(16)
+                    .safeAreaInset(edge: .bottom) {
+                        EmptyView()
+                            .frame(height: Measures.kTabBarHeight + 70)
+                    }
+                    .safeAreaInset(edge: .top) {
+                        EmptyView()
+                            .frame(height: Measures.kTopShapeHeightSmaller + 60)
+                    }
+                    .safeAreaTopPadding(proxy: proxy)
+                    .overlay(alignment: .top) {
+                        headerView(proxy)
+                    }
                 }
             }
             .scrollIndicators(.hidden)
@@ -264,7 +285,7 @@ struct CategoriesView_Previews: PreviewProvider {
             FSCategory(id: "3", name: "Clases online", is_manual: false),
         ]
         
-        mockManager.allSkillsSaved = Skill.sampleArray
+        mockManager.allSkillsSaved = []
         return GeometryReader { proxy in
             HomeView(proxy: proxy)
                 .environment(AuthenticatorManager())
