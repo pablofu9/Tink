@@ -42,7 +42,9 @@ struct NewSkillView: View {
     @State private var skillName: String = ""
     @State private var skillDescription: String = ""
     @State private var price: String = ""
-    @State private var selectedPrice: NewSkillPrice? = nil
+    @State private var selectedPrice: NewSkillPrice = .eurHour
+    @State private var showPricePicker = false
+
     @State private var newSkillOnline: NewSkillOnline? = nil
     var counter: Int {
         150 - skillDescription.count
@@ -105,7 +107,7 @@ extension NewSkillView {
                     LazyVStack(alignment: .leading, spacing: 20) {
                         nameView
                         descriptionView
-                        priceView
+                        priceView(proxy)
                         categoryPicker
                         onlinePickerView
                         if skill != nil {
@@ -281,26 +283,58 @@ extension NewSkillView {
     
     /// Hability name view
     @ViewBuilder
-    private var priceView: some View {
-        HStack(spacing: 20) {
-            VStack(alignment: .leading ,spacing: 3) {
-                Text("NEW_SKILL_PRICE".localized)
-                    .foregroundStyle(ColorManager.primaryGrayColor.opacity(0.8))
-                    .font(.custom(CustomFonts.regular, size: 17))
-                TextField("", text: $price, prompt: propmtView("NEW_SKILL_PRICE_PROPMT".localized))
-                    .textFieldStyle(LoginTextField(focused: focusState == .price))
-                    .focused($focusState, equals: .price)
-                    .keyboardType(.numberPad)
-                    .onSubmit {
-                        focusState = nil
+    private func priceView(_ proxy: GeometryProxy) -> some View {
+        VStack(alignment: .leading ,spacing: 3) {
+            Text("NEW_SKILL_PRICE".localized)
+                .foregroundStyle(ColorManager.primaryGrayColor.opacity(0.8))
+                .font(.custom(CustomFonts.regular, size: 17))
+            TextField("", text: $price, prompt: propmtView("NEW_SKILL_PRICE_PROPMT".localized))
+                .textFieldStyle(LoginTextField(focused: focusState == .price))
+                .frame(width: proxy.size.width / 2)
+                .focused($focusState, equals: .price)
+                .keyboardType(.numberPad)
+                .onSubmit {
+                    focusState = nil
+                }
+                .submitLabel(.done)
+                .overlay(alignment: .trailing) {
+                    Text(selectedPrice.description)
+                        .foregroundStyle(ColorManager.primaryGrayColor.opacity(0.6))
+                        .font(.custom(CustomFonts.regular, size: 17))
+                        .padding(.trailing, 15)
+                        .onTapGesture {
+                            showPricePicker = true
+                        }
+                }
+        }
+        .sheet(isPresented: $showPricePicker) {
+            VStack(spacing: 15) {
+                Text("CHOOSE_PRICE".localized)
+                    .font(.custom(CustomFonts.medium, size: 18))
+                    .foregroundStyle(ColorManager.primaryGrayColor)
+                    .padding(.top, 30)
+                
+                Picker("Tipo de Precio", selection: $selectedPrice) {
+                    ForEach(NewSkillPrice.allCases, id: \.self) { price in
+                        Text(price.description).tag(price)
                     }
-                    .submitLabel(.done)
+                }
+                .pickerStyle(.wheel)
+                
+                Button {
+                    showPricePicker = false
+                } label: {
+                    Text("ACCEPT")
+                        .font(.custom(CustomFonts.medium, size: 17))
+                        .foregroundStyle(ColorManager.defaultWhite)
+                        .padding(.vertical, 12)
+                        .padding(.horizontal, 30)
+                        .background(ColorManager.primaryBasicColor)
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                }
+                .padding(.bottom, 10)
             }
-            GenericPickerView(
-                title: "NEW_SKILL_PRICE_FORMAT".localized,
-                options: NewSkillPrice.allCases,
-                selectedOption: $selectedPrice
-            )
+            .presentationDetents([.fraction(0.3)])
         }
     }
     
@@ -409,9 +443,9 @@ extension NewSkillView {
 // MARK: - PRIVATE FUNCS
 extension NewSkillView {
     
-    // Check if form is valid
+    /// Check if form is valid
     func isFormValid() -> Bool {
-        let isValid = selectedPrice != nil &&
+        let isValid =
         selectedCategory != nil &&
         !skillName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
         !skillDescription.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
@@ -420,6 +454,7 @@ extension NewSkillView {
         return isValid
     }
     
+    /// Initialyse modify view
     func initialyseModifyView() {
         if let skill {
             print("category: \(skill.category)")
@@ -451,7 +486,7 @@ extension NewSkillView {
             }
             
             do {
-                if let selectedCategory, let selectedPrice {
+                if let selectedCategory {
                     if let _ = selectedCategory.is_manual {
                         try await databaseManager.createNewSkill(skillName: skillName, skillDescription: skillDescription, skillPrice: price, category: selectedCategory, newSkillPrince: selectedPrice)
                     } else {
@@ -473,7 +508,7 @@ extension NewSkillView {
                 dismiss()
             }
             do {
-                if var skill, let selectedCategory, let selectedPrice {
+                if var skill, let selectedCategory {
                     skill.name = skillName
                     skill.category = selectedCategory
                     skill.description = skillDescription

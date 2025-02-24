@@ -222,7 +222,6 @@ extension SkillDetailView {
             if let categoryIsOnline = skill.category.is_manual {
                 if categoryIsOnline {
                     horizontalInfoRow("NEW_SKILL_PRESENCIAL".localized, info: "NEW_SKILL_PRESENCIAL".localized, hasDivider: true,icon: .inPersonIcon)
-                    horizontalInfoRow("LOCALITY".localized, info: "\(skill.user.locality), \(skill.user.province)")
                 } else {
                     horizontalInfoRow("NEW_SKILL_PRESENCIAL".localized, info: "NEW_SKILL_ONLINE".localized, icon: .onlineIcon)
                 }
@@ -232,7 +231,6 @@ extension SkillDetailView {
                         horizontalInfoRow("NEW_SKILL_PRESENCIAL".localized, info: "NEW_SKILL_ONLINE".localized, icon: .onlineIcon)
                     } else {
                         horizontalInfoRow("NEW_SKILL_PRESENCIAL".localized, info: "NEW_SKILL_PRESENCIAL".localized, hasDivider: true,icon: .inPersonIcon)
-                        horizontalInfoRow("LOCALITY".localized, info: "\(skill.user.locality), \(skill.user.province)")
                     }
                 }
             }

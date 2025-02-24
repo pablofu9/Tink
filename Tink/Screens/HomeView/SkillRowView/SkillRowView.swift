@@ -91,19 +91,17 @@ extension SkillRowView {
                     case .empty:
                         ProgressView()
                     case .success(let image):
-                        image.resizable()
-                            .frame(height: imageHeight)
-                            .cornerRadius(10)
+                        image
+                            .resizable()
                     case .failure:
                         LoadingView()
-                            .frame(height: imageHeight)
-                            .cornerRadius(10)
                     @unknown default:
                         LoadingView()
-                            .frame(height: imageHeight)
-                            .cornerRadius(10)
                     }
                 }
+                .aspectRatio(contentMode: .fill)
+                .frame(width: (UIScreen.main.bounds.size.width - 48) / 2, height: imageHeight)
+                .cornerRadius(10)
             } else {
                 ColorManager.primaryGrayColor.opacity(0.5)
                     .frame(height: imageHeight)
@@ -168,9 +166,6 @@ extension SkillRowView {
                 iconView(.inPersonIcon)
                 isOnlineText("NEW_SKILL_PRESENCIAL".localized)
             }
-            Text(skill.user.locality)
-                .font(.custom(CustomFonts.regular, size: 16))
-                .foregroundStyle(ColorManager.primaryGrayColor.opacity(0.7))
         }
     }
 }

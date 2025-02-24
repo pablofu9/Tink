@@ -138,7 +138,7 @@
 "NEW_SKILL_DESCRIPTION_PROMPT"                  = "Ej: Clases online de inglés nivel básico, servicios de fontanería generales...";
 "NEW_SKILL_SELECT_CATEGORY"                     = "Selecciona una categoría";
 "NEW_SKILL_PRICE"                               = "Precio";
-"NEW_SKILL_PRICE_PROPMT"                        = "Elige un precio";
+"NEW_SKILL_PRICE_PROPMT"                        = "Precio...";
 "NEW_SKILL_PRICE_FORMAT"                        = "Formato";
 "NEW_SKILL_ONLINE"                              = "Online";
 "NEW_SKILL_PRESENCIAL"                          = "Presencial";
@@ -150,6 +150,7 @@
 "MODIFY_DELETE_SKILL"                           = "Eliminar";
 "ALERT_DELETE_HEADER"                           = "Eliminar anuncio";
 "ALERT_DELETE_BODY"                             = "¿Estás seguro de que deseas eliminar el anuncio?";
+"CHOOSE_PRICE"                                  = "Tipo de precio";
 
 
 /*************************************/

@@ -66,6 +66,11 @@ struct MainView: View {
                 
                 }
             }
+            .onAppear {
+                Task {
+                    databaseManager.handleUserInFirestore()
+                }
+            }
     }
 }
 

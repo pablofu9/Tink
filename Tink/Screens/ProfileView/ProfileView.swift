@@ -163,7 +163,6 @@ extension ProfileView {
                     .foregroundStyle(ColorManager.primaryGrayColor)
                 rowView(name: "person.fill", text: "NAME".localized, udText: "\(profileSaved.name)")
                 rowView(name: "envelope.fill", text: "LOGIN_EMAIL".localized, udText: profileSaved.email)
-                rowView(name: "map.fill", text: "LOCALITY".localized, udText: "\(profileSaved.locality), \(profileSaved.province)")
             }
             .padding(.horizontal, Measures.kHomeHorizontalPadding)
         }

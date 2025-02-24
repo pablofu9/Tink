@@ -19,6 +19,7 @@
 		D8CDF9312D5A0A1300173F00 /* FirebaseFirestoreCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = D8CDF9302D5A0A1300173F00 /* FirebaseFirestoreCombine-Community */; };
 		D8CDF9332D5A0A1300173F00 /* FirebasePerformance in Frameworks */ = {isa = PBXBuildFile; productRef = D8CDF9322D5A0A1300173F00 /* FirebasePerformance */; };
 		D8CDF9352D5A0A1300173F00 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = D8CDF9342D5A0A1300173F00 /* FirebaseStorage */; };
+		D8D1E50E2D6C86AF00B444DA /* StreamChatSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = D8D1E50D2D6C86AF00B444DA /* StreamChatSwiftUI */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -51,6 +52,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D8D1E50E2D6C86AF00B444DA /* StreamChatSwiftUI in Frameworks */,
 				D8CDF9242D5A09C400173F00 /* GoogleSignIn in Frameworks */,
 				D8CDF9292D5A0A1300173F00 /* FirebaseAppCheck in Frameworks */,
 				D8CDF9352D5A0A1300173F00 /* FirebaseStorage in Frameworks */,
@@ -117,6 +119,7 @@
 				D84AE8FB2D5BA0870069672D /* Lottie */,
 				D80BB4322D5E222900772C62 /* SDWebImageSwiftUI */,
 				D8336A3F2D660851004E7A0F /* Cloudinary */,
+				D8D1E50D2D6C86AF00B444DA /* StreamChatSwiftUI */,
 			);
 			productName = Tink;
 			productReference = D8C717632D560C9F00D2A5BF /* Tink.app */;
@@ -152,6 +155,7 @@
 				D84AE8FA2D5BA0870069672D /* XCRemoteSwiftPackageReference "lottie-ios" */,
 				D80BB4312D5E222900772C62 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
 				D8336A3E2D660851004E7A0F /* XCRemoteSwiftPackageReference "cloudinary_ios" */,
+				D8D1E50C2D6C86AF00B444DA /* XCRemoteSwiftPackageReference "stream-chat-swiftui" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = D8C717642D560C9F00D2A5BF /* Products */;
@@ -450,6 +454,14 @@
 				minimumVersion = 11.8.1;
 			};
 		};
+		D8D1E50C2D6C86AF00B444DA /* XCRemoteSwiftPackageReference "stream-chat-swiftui" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/GetStream/stream-chat-swiftui.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.72.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -512,6 +524,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = D8CDF9272D5A0A1300173F00 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseStorage;
+		};
+		D8D1E50D2D6C86AF00B444DA /* StreamChatSwiftUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D8D1E50C2D6C86AF00B444DA /* XCRemoteSwiftPackageReference "stream-chat-swiftui" */;
+			productName = StreamChatSwiftUI;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
