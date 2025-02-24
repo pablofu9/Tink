@@ -49,7 +49,8 @@ struct HomeView: View {
        ]
     // Selected skill for navigation
     @State private var selectedSkill: Skill?
-
+    // Active tab
+    @Binding var activeTab: TabModel
     // MARK: - BODY
     var body: some View {
         ZStack(alignment: .top) {
@@ -103,7 +104,7 @@ struct HomeView: View {
            
         }
         .fullScreenCover(item: $selectedSkill) { skill in
-            SkillDetailView(skill: skill)
+            SkillDetailView(skill: skill, activeTab: $activeTab)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(ColorManager.bgColor)
@@ -287,7 +288,7 @@ struct CategoriesView_Previews: PreviewProvider {
         
         mockManager.allSkillsSaved = []
         return GeometryReader { proxy in
-            HomeView(proxy: proxy)
+            HomeView(proxy: proxy, activeTab: .constant(.home))
                 .environment(AuthenticatorManager())
                 .environmentObject(mockManager)
                 .ignoresSafeArea()

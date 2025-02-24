@@ -168,3 +168,8 @@
 "SKILL_DETAIL_INFO"                             = "Información del anunciante";
 "SKILL_DETAIL_WRITE_MESSAGE"                    = "Escribir un mensaje";
 
+
+/*************************************/
+// MARK: - CHATS
+/*************************************/
+"CHAT_NO_CHATS"                                 = "Todavía no tienes ninguna conversación";

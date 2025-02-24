@@ -217,11 +217,14 @@ extension FSDatabaseManager {
             ? user.displayName!
             : user.email?.components(separatedBy: "@").first ?? ""
             
-            let saveUser = User(id: user.uid, name: name, email: user.email ?? "")
-            // 4. Save user in userdefaults
-            UserDefaults.standard.userSaved = saveUser
+            var saveUser = User(id: user.uid, name: name, email: user.email ?? "", profileImageURL: "")
+            
             if let document = document, document.exists {
                 print("User already exists in firestore. - Do nothing")
+                if let data = document.data(),
+                   let profileImageURL = data["profileImageURL"] as? String {
+                    saveUser.profileImageURL = profileImageURL
+                }
             } else {
                 do {
                     let encodedUser = try Firestore.Encoder().encode(saveUser)
@@ -239,6 +242,7 @@ extension FSDatabaseManager {
                     print("Codification Error: \(error.localizedDescription)")
                 }
             }
+            UserDefaults.standard.userSaved = saveUser
         }
     }
     

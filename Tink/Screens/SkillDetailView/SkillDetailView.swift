@@ -18,6 +18,8 @@ struct SkillDetailView: View {
         return 1 - min(abs(offsetX) / 200, 1)
     }
     @EnvironmentObject var chatManager: ChatManager
+    // Active tab
+    @Binding var activeTab: TabModel
     
     // MARK: - BODY
     var body: some View {
@@ -298,6 +300,8 @@ extension SkillDetailView {
                 Button {
                     Task {
                         try await chatManager.createChat(with: skill.user)
+                        dismiss()
+                        activeTab = .chat
                     }
                 } label: {
                     Text("SKILL_DETAIL_WRITE_MESSAGE".localized)
@@ -355,5 +359,5 @@ extension SkillDetailView {
 }
 
 #Preview {
-    SkillDetailView(skill: Skill.sample)
+    SkillDetailView(skill: Skill.sample, activeTab: .constant(.home))
 }

@@ -98,9 +98,9 @@ class AuthenticatorManager: NSObject, ASAuthorizationControllerDelegate {
     
     /// Sign out function
     func signOut()  throws {
+        resetProfile()
         try Auth.auth().signOut()
         authState = .notAuthenticated
-        resetProfile()
     }
     
     @MainActor

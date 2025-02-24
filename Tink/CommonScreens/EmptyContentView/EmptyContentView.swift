@@ -11,7 +11,7 @@ struct EmptyContentView: View {
     
     let title: String
     let image: ImageResource
-    
+    var frame: Double = 300.0
     var body: some View {
         VStack(alignment: .center, spacing: 10) {
             Text(title)
@@ -19,7 +19,7 @@ struct EmptyContentView: View {
                 .font(.custom(CustomFonts.regular, size: 22))
             Image(image)
                 .resizable()
-                .frame(width: 300, height: 300)
+                .frame(width: frame, height: frame)
         }
         .padding(.horizontal, Measures.kHomeHorizontalPadding)
     }

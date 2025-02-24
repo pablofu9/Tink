@@ -8,16 +8,31 @@
 import Foundation
 import FirebaseFirestore
 
+/// Manages chat-related operations such as fetching, observing, creating, and deleting chats.
 @MainActor
 @Observable
 class ChatManager: ObservableObject {
     
+    /// List of messages in the currently selected chat.
     var messages: [Message] = []
+    
+    /// Message listener
+    private var messageListener: ListenerRegistration?
+    
+    /// List of chats in which the user is a participant.
     var chats: [Chat] = []
-    private var db = Firestore.firestore()
-    var loading: Bool = false
+    
+    /// Chart listener
     private var chatListener: ListenerRegistration?
     
+    /// Firestore database reference.
+    private var db = Firestore.firestore()
+    
+    /// Indicates whether data is currently being loaded.
+    var loading: Bool = false
+    
+    /// Retrieves the list of chats for the authenticated user.
+    /// - Throws: An error if Firestore operations fail.
     func getChats() async throws {
         loading = true
         defer { loading = false }
@@ -26,12 +41,11 @@ class ChatManager: ObservableObject {
             return
         }
         
-        // Usa el ID del usuario en lugar del objeto completo
         let userId = user.id
         
         do {
             let querySnapshot = try await db.collection("chats")
-                .whereField("users", arrayContains: userId) // Usa el ID del usuario
+                .whereField("users", arrayContains: userId)
                 .getDocuments()
             
             guard !querySnapshot.documents.isEmpty else {
@@ -41,8 +55,7 @@ class ChatManager: ObservableObject {
             
             self.chats = querySnapshot.documents.compactMap { document in
                 do {
-                    let chat = try document.data(as: Chat.self)
-                    return chat
+                    return try document.data(as: Chat.self)
                 } catch {
                     print("Error decoding chat: \(error.localizedDescription)")
                     return nil
@@ -54,9 +67,11 @@ class ChatManager: ObservableObject {
         }
     }
     
+    /// Observes real-time updates for messages in a specific chat.
+    /// - Parameter chatId: The ID of the chat to observe.
     @MainActor
     func observeMessages(for chatId: String) {
-        db.collection("chats")
+        messageListener = db.collection("chats")
             .document(chatId)
             .addSnapshotListener { [weak self] documentSnapshot, error in
                 guard let self = self else { return }
@@ -73,9 +88,8 @@ class ChatManager: ObservableObject {
                 
                 do {
                     let chat = try document.data(as: Chat.self)
-                    
                     DispatchQueue.main.async {
-                        self.messages = chat.messages // Actualiza solo los mensajes de este chat
+                        self.messages = chat.messages
                     }
                 } catch {
                     print("Error decoding chat messages: \(error.localizedDescription)")
@@ -83,17 +97,13 @@ class ChatManager: ObservableObject {
             }
     }
     
-    func stopObservingMessages() {
-        chatListener?.remove()
-        chatListener = nil
-    }
-    
+    /// Observes real-time updates for the list of chats of the authenticated user.
     func observeChats() {
         guard let user = UserDefaults.standard.userSaved else { return }
         
         let userId = user.id
         
-        db.collection("chats")
+        chatListener = db.collection("chats")
             .whereField("users", arrayContains: userId)
             .addSnapshotListener { [weak self] querySnapshot, error in
                 guard let self = self else { return }
@@ -115,29 +125,49 @@ class ChatManager: ObservableObject {
                 }
             }
     }
-
+    
+    /// Stops observing chats to free up resources.
+    func stopObservingChats() {
+        chatListener?.remove()
+        chatListener = nil
+        print("🛑 Stopped observing chats")
+    }
+    
+    /// Stops observing messages to free up resources.
+    func stopObservingMessages() {
+        messageListener?.remove()
+        messageListener = nil
+        print("🛑 Stopped observing messages")
+    }
+    
+    /// Creates a new chat between the authenticated user and another user.
+    /// If a chat already exists, the function returns without creating a new one.
+    /// - Parameter recipientUser: The user to start the chat with.
+    /// - Throws: An error if Firestore operations fail.
     func createChat(with recipientUser: User) async throws {
         guard let user = UserDefaults.standard.userSaved else {
             return
         }
+        
         let userIds = [user.id, recipientUser.id]
         let db = Firestore.firestore()
         
-        // 1. Verify if chat already exist
         let query = db.collection("chats")
             .whereField("users", arrayContains: user.id)
-            .whereField("users", arrayContains: recipientUser.id)
         
         do {
             let querySnapshot = try await query.getDocuments()
             
-            // 2. If exist we return
-            if !querySnapshot.documents.isEmpty {
+            let existingChat = querySnapshot.documents.first { document in
+                let chatUsers = document["users"] as? [String] ?? []
+                return chatUsers.contains(recipientUser.id)
+            }
+            
+            if existingChat != nil {
                 print("Chat already exists")
                 return
             }
             
-            // 3. If doesnt exist create chat
             var chat = Chat(id: "", messages: [], users: userIds)
             let chatRef = db.collection("chats").document()
             
@@ -149,32 +179,33 @@ class ChatManager: ObservableObject {
         }
     }
     
+    /// Sends a new message to a specific chat.
+    /// - Parameters:
+    ///   - text: The text content of the message.
+    ///   - chatId: The ID of the chat where the message is sent.
+    ///   - senderId: The ID of the sender.
+    /// - Throws: An error if the message cannot be sent.
     func sendMessage(text: String, chatId: String, senderId: String) async throws {
         let db = Firestore.firestore()
         
-        // 1. Crear el objeto Message
         let message = Message(
-            id: UUID().uuidString, // Generar un ID único para el mensaje
+            id: UUID().uuidString,
             text: text,
-            received: false, // El mensaje no ha sido recibido aún
-            timestamp: Date(), // Fecha y hora actual
-            users: senderId // 🔹 Guardamos solo el ID del usuario
+            received: false,
+            timestamp: Date(),
+            users: senderId
         )
         
-        // 2. Referencia al chat específico
         let chatRef = db.collection("chats").document(chatId)
         
         do {
-            // 3. Obtener el chat actual
             let document = try await chatRef.getDocument()
             
-            // 4. Verificar si el chat existe
             guard document.exists else {
                 throw NSError(domain: "FirestoreError", code: 404, userInfo: [NSLocalizedDescriptionKey: "Chat not found"])
             }
             
-            // 5. Agregar el mensaje al array de mensajes en Firestore
-           try await MainActor.run {
+            try await MainActor.run {
                 chatRef.updateData([
                     "messages": FieldValue.arrayUnion([try Firestore.Encoder().encode(message)])
                 ])
@@ -185,4 +216,32 @@ class ChatManager: ObservableObject {
             throw NSError(domain: "FirestoreError", code: 500, userInfo: [NSLocalizedDescriptionKey: "Error sending message: \(error.localizedDescription)"])
         }
     }
+    
+    /// Deletes a chat from Firestore if the current user is part of it.
+    /// - Parameter chat: The `Chat` object to be deleted.
+    /// - Throws: An error if the chat deletion fails.
+    func deleteChat(_ chat: Chat) async throws {
+        guard let user = UserDefaults.standard.userSaved else {
+            print("❌ No user saved in UserDefaults")
+            return
+        }
+        
+        let db = Firestore.firestore()
+        let chatRef = db.collection("chats").document(chat.id)
+        
+        do {
+            let document = try await chatRef.getDocument()
+            
+            if let data = document.data(), let users = data["users"] as? [String], users.contains(user.id) {
+                try await chatRef.delete()
+                print("✅ Chat deleted successfully")
+            } else {
+                print("⚠️ User is not part of this chat or chat does not exist")
+            }
+        } catch {
+            throw NSError(domain: "FirestoreError", code: 500, userInfo: [NSLocalizedDescriptionKey: "Error deleting chat: \(error.localizedDescription)"])
+        }
+    }
+    
+    
 }

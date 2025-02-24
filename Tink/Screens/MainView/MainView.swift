@@ -83,7 +83,7 @@ extension MainView {
     private func getSelectedView(_ proxy: GeometryProxy) -> some View {
         switch activeTab {
         case .home:
-            HomeView(proxy: proxy)
+            HomeView(proxy: proxy, activeTab: $activeTab)
         case .settings:
             SettingsView(proxy: proxy, showImageSourceActionSheet: $showImageSourceActionSheet, showImageBig: $showImageView, nameSpace: animation)
         case .chat:

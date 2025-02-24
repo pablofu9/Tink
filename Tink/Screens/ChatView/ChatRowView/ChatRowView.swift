@@ -17,12 +17,24 @@ struct ChatRowView: View {
     @State var isPresented: Bool = false
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 15) {
+        VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 15) {
                 imageView
-                VStack(alignment: .leading, spacing: 5) {
-                    Text(user?.name ?? "")
-                        .font(.custom(CustomFonts.bold, size: 17))
+                VStack(alignment: .leading, spacing: 0) {
+                    HStack {
+                        Text(user?.name ?? "")
+                            .font(.custom(CustomFonts.bold, size: 17))
+                            .foregroundStyle(ColorManager.primaryGrayColor)
+                        Spacer()
+                        if let lastMessageNotUs = chat.messages.last(where: {$0.users != UserDefaults.standard.userSaved?.id}) {
+                            
+                            Text("\(lastMessageNotUs.timestamp.formatted(.dateTime.hour().minute()))")
+                                .font(.custom(CustomFonts.regular, size: 16))
+                                .foregroundStyle(ColorManager.primaryGrayColor.opacity(0.7))
+                        }
+                    }
+                    Text(user?.email ?? "")
+                        .font(.custom(CustomFonts.regular, size: 16))
                         .foregroundStyle(ColorManager.primaryGrayColor)
                     HStack {
                         if let lastMessageNotUs = chat.messages.last(where: {$0.users != UserDefaults.standard.userSaved?.id}) {
@@ -31,9 +43,7 @@ struct ChatRowView: View {
                                 .font(.custom(CustomFonts.regular, size: 16))
                                 .foregroundStyle(ColorManager.primaryGrayColor.opacity(0.7))
                             Spacer()
-                            Text("\(lastMessageNotUs.timestamp.formatted(.dateTime.hour().minute()))")
-                                .font(.custom(CustomFonts.regular, size: 16))
-                                .foregroundStyle(ColorManager.primaryGrayColor.opacity(0.7))
+                     
                         }
                     }
                 }
@@ -76,13 +86,15 @@ struct ChatRowView: View {
                 }
             }
             .resizable()
-            .frame(width: 55, height: 55)
+            .frame(width: 60, height: 60)
             .background(ColorManager.defaultWhite)
             .clipShape(Circle())
             .shadow(color: ColorManager.primaryGrayColor.opacity(0.5), radius: 3, x: 2, y: 3)
         } else {
             Image(.noProfileIcon)
-                .frame(width: 55, height: 55)
+                .resizable()
+                .frame(width: 50, height: 50)
+                .padding(5)
                 .background(ColorManager.defaultWhite)
                 .clipShape(Circle())
                 .shadow(color: ColorManager.primaryGrayColor.opacity(0.5), radius: 3, x: 2, y: 3)

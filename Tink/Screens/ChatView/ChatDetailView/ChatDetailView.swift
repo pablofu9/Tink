@@ -11,13 +11,17 @@ import SDWebImageSwiftUI
 
 struct ChatDetailView: View {
     
+    // MARK: - PROPERTIES
     var chat: Chat
     let userNotUs: User
     @State private var text: String = ""
     @Environment(\.dismiss) var dismiss
     @EnvironmentObject var chatManager: ChatManager
     @StateObject private var keyboardObserver = KeyboardObserver()
-
+    @FocusState var focus
+    let height: Double = 130
+    
+    // MARK: - BODY
     var body: some View {
         GeometryReader { proxy in
             ZStack(alignment: .top) {
@@ -29,20 +33,30 @@ struct ChatDetailView: View {
                                     .id(message.id)
                             }
                         }
+                        .safeAreaInset(edge: .top) {
+                            EmptyView()
+                                .frame(height: height)
+                        }
                         .safeAreaTopPadding(proxy: proxy)
                         .overlay(alignment: .top) {
                             headerView(proxy)
                         }
-                        .onChange(of: keyboardObserver.keyboardHeight) {
-                            print("\(keyboardObserver.keyboardHeight)")
-                        }
                     }
-                    .padding(.bottom, keyboardObserver.keyboardHeight > 0 ? keyboardObserver.keyboardHeight + 65 : 125)
+                    .onAppear {
+                        scrollToBottom(reader)
+                    }
+                    .padding(.bottom, keyboardObserver.keyboardHeight > 0 ? keyboardObserver.keyboardHeight + 65 : 110)
                     .onChange(of: chatManager.messages) {
+                        scrollToBottom(reader)
+                    }
+                    .onChange(of: keyboardObserver.keyboardHeight) {
                         scrollToBottom(reader)
                     }
                     .coordinateSpace(name: "SCROLL")
                 }
+            }
+            .onTapGesture {
+                focus = false
             }
             .overlay(alignment: .bottom) {
                 textfieldCustom
@@ -54,30 +68,38 @@ struct ChatDetailView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(ColorManager.bgColor)
         .onAppear {
-            chatManager.observeMessages(for: chat.id) // Escucha los mensajes solo de este chat
+            chatManager.observeMessages(for: chat.id) 
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                 scrollToBottom(nil)
             }
         }
         .onDisappear {
+            Task {
+                if chatManager.messages.isEmpty {
+                    try await chatManager.deleteChat(chat)
+                   
+                }
+            }
             chatManager.stopObservingMessages()
         }
     }
 }
 
+// MARK: - SUBVIEWS
 extension ChatDetailView {
     
     @ViewBuilder
     private func headerView(_ proxy: GeometryProxy) -> some View {
-        let height: Double = 130
+       
         GeometryReader { reader in
             let minY = reader.frame(in: .named("SCROLL")).minY
-            HStack(spacing: 5) {
+            HStack(spacing: 20) {
                 BackButton(action: {
                     dismiss()
                 })
+                
                 imageView
-                    .padding(.trailing, 10)
+                    
                 Text(userNotUs.name)
                     .foregroundStyle(ColorManager.defaultWhite)
                     .font(.custom(CustomFonts.regular, size: 17))
@@ -116,7 +138,9 @@ extension ChatDetailView {
             .shadow(color: ColorManager.primaryGrayColor.opacity(0.5), radius: 3, x: 2, y: 3)
         } else {
             Image(.noProfileIcon)
-                .frame(width: 55, height: 55)
+                .resizable()
+                .frame(width: 45, height: 45)
+                .padding(5)
                 .background(ColorManager.defaultWhite)
                 .clipShape(Circle())
                 .shadow(color: ColorManager.primaryGrayColor.opacity(0.5), radius: 3, x: 2, y: 3)
@@ -127,6 +151,7 @@ extension ChatDetailView {
     private var textfieldCustom: some View {
         HStack {
             TextField("", text: $text, prompt: Text("Escribe aquí"))
+                .focused($focus)
                 .padding(15)
                 .background(ColorManager.secondaryGrayColor)
                 .clipShape(Capsule())
@@ -157,7 +182,9 @@ extension ChatDetailView {
     private func scrollToBottom(_ reader: ScrollViewProxy?) {
         guard let lastMessageId = chatManager.messages.last?.id else { return }
         DispatchQueue.main.async {
-            reader?.scrollTo(lastMessageId, anchor: .top)
+            withAnimation {
+                reader?.scrollTo(lastMessageId, anchor: .top)
+            }
         }
     }
 }
@@ -169,34 +196,4 @@ extension ChatDetailView {
         .environmentObject(ChatManager())
 }
 
-import SwiftUI
-import Combine
 
-// Observador para el teclado
-class KeyboardObserver: ObservableObject {
-    @Published var keyboardHeight: CGFloat = 0
-    
-    private var cancellables = Set<AnyCancellable>()
-    
-    init() {
-        // Observa el cambio en el teclado
-        NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)
-            .map { notification -> CGFloat in
-                if let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
-                    return keyboardFrame.height
-                }
-                return 0
-            }
-            .sink { [weak self] height in
-                self?.keyboardHeight = height
-            }
-            .store(in: &cancellables)
-        
-        NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)
-            .map { _ in CGFloat(0) }
-            .sink { [weak self] height in
-                self?.keyboardHeight = height
-            }
-            .store(in: &cancellables)
-    }
-}

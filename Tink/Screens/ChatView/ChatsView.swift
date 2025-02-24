@@ -12,12 +12,18 @@ struct ChatsView: View {
     @EnvironmentObject var chatManager: ChatManager
     let proxy: GeometryProxy
     
+    // MARK: - BODY
     var body: some View {
         ZStack(alignment: .top) {
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 10) {
-                    ForEach(chatManager.chats) { chat in
-                        ChatRowView(chat: chat)
+                    if !chatManager.chats.isEmpty {
+                        ForEach(chatManager.chats) { chat in
+                            ChatRowView(chat: chat)
+                        }
+                    } else {
+                        EmptyContentView(title: "CHAT_NO_CHATS".localized, image: .noChatsIcon, frame: 200)
+                            .padding(.top, UIScreen.main.bounds.size.height / 7)
                     }
                 }
                 .frame(maxHeight: .infinity, alignment: .top)
@@ -38,10 +44,12 @@ struct ChatsView: View {
         }
         .onAppear {
             Task {
-                try await chatManager.getChats()
+                chatManager.observeChats()
             }
         }
-     
+        .onDisappear {
+            chatManager.stopObservingChats()
+        }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(ColorManager.bgColor)
     }
@@ -49,6 +57,7 @@ struct ChatsView: View {
 
 extension ChatsView {
     
+    /// Header View
     @ViewBuilder
     private var headerView: some View {
         let height: Double = 90
