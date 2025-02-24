@@ -57,6 +57,19 @@ class AuthenticatorManager: NSObject, ASAuthorizationControllerDelegate {
         }
     }
     
+    func getFirebaseIDToken(completion: @escaping (String?) -> Void) {
+        Auth.auth().currentUser?.getIDToken { token, error in
+            if let error = error {
+                print("Error getting Firebase ID token: \(error)")
+                completion(nil)
+                return
+            }
+            
+            // Aquí tienes el token de Firebase
+            completion(token)
+        }
+    }
+    
     /// Sign up with email func
     @MainActor
     func singUp(email: String, password: String, passRepeat: String) async  {

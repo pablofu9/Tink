@@ -212,29 +212,27 @@ extension FSDatabaseManager {
         let userRef = db.collection("users").document(user.uid)
         
         userRef.getDocument { document, error in
-            // 2. If user already exists in Firestore, do nothing
+            // 3. User doesn't exist, create it
+            let name = (user.displayName?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false)
+            ? user.displayName!
+            : user.email?.components(separatedBy: "@").first ?? ""
+            
+            let saveUser = User(id: user.uid, name: name, email: user.email ?? "")
+            // 4. Save user in userdefaults
+            UserDefaults.standard.userSaved = saveUser
             if let document = document, document.exists {
                 print("User already exists in firestore. - Do nothing")
             } else {
-                // 3. User doesn't exist, create it
-                let name = (user.displayName?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false)
-                    ? user.displayName!
-                    : user.email?.components(separatedBy: "@").first ?? ""
-                
-                let saveUser = User(id: user.uid, name: name, email: user.email ?? "")
-                // 4. Save user in userdefaults
-                UserDefaults.standard.userSaved = saveUser
-
                 do {
                     let encodedUser = try Firestore.Encoder().encode(saveUser)
-
+                    
                     // 4. Save user in Firestore
                     userRef.setData(encodedUser, merge: true) { error in
                         if let error = error {
                             print("Error saving user in firestore: \(error.localizedDescription)")
                         } else {
                             print("User saved in firestore correctly.")
-
+                            
                         }
                     }
                 } catch {
@@ -242,6 +240,28 @@ extension FSDatabaseManager {
                 }
             }
         }
+    }
+    
+    func getUser(userID: String) async throws -> User? {
+        let firestore = Firestore.firestore()
+            
+            do {
+                // Obtener el documento del usuario usando su ID
+                let document = try await firestore.collection("users").document(userID).getDocument()
+                
+                // Verificar si el documento existe
+                guard document.exists else {
+                    print("User not found")
+                    return nil
+                }
+                
+                // Decodificar el documento en un objeto User
+                let user = try document.data(as: User.self)
+                return user
+            } catch {
+                print("Error fetching user: \(error.localizedDescription)")
+                throw error
+            }
     }
     
     /// Delete account

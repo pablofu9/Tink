@@ -17,6 +17,8 @@ struct SkillDetailView: View {
     var computedOpacity: CGFloat {
         return 1 - min(abs(offsetX) / 200, 1)
     }
+    @EnvironmentObject var chatManager: ChatManager
+    
     // MARK: - BODY
     var body: some View {
         GeometryReader { reader in
@@ -292,25 +294,29 @@ extension SkillDetailView {
             Text(skill.user.email)
                 .font(.custom(CustomFonts.medium, size: 16))
                 .foregroundStyle(ColorManager.primaryGrayColor)
-            Button {
-                
-            } label: {
-                Text("SKILL_DETAIL_WRITE_MESSAGE".localized)
-                    .foregroundStyle(ColorManager.defaultWhite)
-                    .font(.custom(CustomFonts.medium, size: 17))
-               
+            if skill.user.id != UserDefaults.standard.userSaved?.id {
+                Button {
+                    Task {
+                        try await chatManager.createChat(with: skill.user)
+                    }
+                } label: {
+                    Text("SKILL_DETAIL_WRITE_MESSAGE".localized)
+                        .foregroundStyle(ColorManager.defaultWhite)
+                        .font(.custom(CustomFonts.medium, size: 17))
+                    
+                }
+                .padding(10)
+                .background {
+                    RoundedRectangle(cornerRadius: 10)
+                        .foregroundStyle(ColorManager.primaryBasicColor)
+                }
+                .overlay {
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(lineWidth: 1)
+                        .foregroundStyle(ColorManager.primaryGrayColor)
+                }
+                .padding(.vertical, 10)
             }
-            .padding(10)
-            .background {
-                RoundedRectangle(cornerRadius: 10)
-                    .foregroundStyle(ColorManager.primaryBasicColor)
-            }
-            .overlay {
-                RoundedRectangle(cornerRadius: 10)
-                    .stroke(lineWidth: 1)
-                    .foregroundStyle(ColorManager.primaryGrayColor)
-            }
-            .padding(.vertical, 10)
         }
         .padding(.horizontal, Measures.kHomeHorizontalPadding)
     }

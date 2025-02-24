@@ -24,6 +24,7 @@ struct MainView: View {
     @EnvironmentObject var databaseManager: FSDatabaseManager
     @State var showImageView: Bool = false
     @State var showImageSourceActionSheet: Bool = false
+    @Environment(AuthenticatorManager.self) private var authenticatorManager
 
     // MARK: - MATCHED GEOMETRY EFFECT
     @Namespace var animation
@@ -86,7 +87,7 @@ extension MainView {
         case .settings:
             SettingsView(proxy: proxy, showImageSourceActionSheet: $showImageSourceActionSheet, showImageBig: $showImageView, nameSpace: animation)
         case .chat:
-            EmptyView()
+            ChatsView(proxy: proxy)
         case .profile:
             ProfileView(proxy: proxy)
         }

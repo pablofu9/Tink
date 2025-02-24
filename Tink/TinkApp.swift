@@ -13,7 +13,7 @@ struct TinkApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     @State private var authenticatorManager: AuthenticatorManager
     @StateObject private var databaseManager = FSDatabaseManager()
-    
+    @StateObject private var chatManager = ChatManager()
     init() {
         _authenticatorManager = State(wrappedValue: AuthenticatorManager())
     }
@@ -23,6 +23,7 @@ struct TinkApp: App {
             SplashScreenView()
                 .environment(authenticatorManager)
                 .environmentObject(databaseManager)
+                .environment(chatManager)
         }
     }
 }
