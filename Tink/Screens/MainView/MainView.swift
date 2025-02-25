@@ -50,6 +50,7 @@ struct MainView: View {
                                 showImageView = false
                             }
                         }, nameSpace: animation)
+
                     } else {
                         FullImageView(image: nil, editAction: {
                             withAnimation {
@@ -117,3 +118,9 @@ extension MainView {
         .environment(coordinator)
 }
 
+
+extension AnyTransition {
+    static var identityHack: AnyTransition {
+        .asymmetric(insertion: .identity, removal: .identity)
+    }
+}

@@ -25,37 +25,7 @@ struct FullImageView: View {
                     .fill( ColorManager.primaryBasicColor.opacity(0.95))
                     .ignoresSafeArea()
             }
-
-            if let image ,let url = URL(string: image) {
-                WebImage(url: url) { phase in
-                    switch phase {
-                    case .empty:
-                        ProgressView()
-                    case .success(let image):
-                        image
-                    case .failure:
-                        LoadingView()
-                    @unknown default:
-                        LoadingView()
-                    }
-                }
-                .resizable()
-                .matchedGeometryEffect(id: "image", in: nameSpace)
-                .transition(.scale(scale: 1))
-                .frame(width: UIScreen.main.bounds.size.width - 70, height: UIScreen.main.bounds.size.width - 70)
-                .clipShape(Circle())
-                .shadow(color: ColorManager.primaryGrayColor.opacity(0.5), radius: 3, x: 2, y: 3)
-            } else {
-                Image(.noProfileIcon)
-                    .resizable()
-                    .frame(width: UIScreen.main.bounds.size.width - 90, height: UIScreen.main.bounds.size.width - 90)
-                    .padding(20)
-                    .background(ColorManager.defaultWhite)
-                    .clipShape(Circle())
-                    .matchedGeometryEffect(id: "image", in: nameSpace)
-                    .transition(.scale)
-                    .shadow(color: ColorManager.primaryGrayColor.opacity(0.5), radius: 3, x: 2, y: 3)
-            }
+            imageView
             Button {
                 withAnimation {
                     editAction()
@@ -78,6 +48,46 @@ struct FullImageView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .ignoresSafeArea()
+    }
+    
+    @ViewBuilder
+    private var imageView: some View {
+        ZStack {
+            Color.clear
+               
+                .overlay {
+            if let image ,let url = URL(string: image) {
+                WebImage(url: url) { phase in
+                    switch phase {
+                    case .empty:
+                        ProgressView()
+                    case .success(let image):
+                        image
+                    case .failure:
+                        LoadingView()
+                    @unknown default:
+                        LoadingView()
+                    }
+                }
+                .resizable()
+              
+                .frame(width: UIScreen.main.bounds.size.width - 70, height: UIScreen.main.bounds.size.width - 70)
+                .clipShape(Circle())
+                .shadow(color: ColorManager.primaryGrayColor.opacity(0.5), radius: 3, x: 2, y: 3)
+            } else {
+                Image(.noProfileIcon)
+                    .resizable()
+           
+                    .frame(width: UIScreen.main.bounds.size.width - 90, height: UIScreen.main.bounds.size.width - 90)
+                    .padding(20)
+                    .background(ColorManager.defaultWhite)
+                    .clipShape(Circle())
+                    .shadow(color: ColorManager.primaryGrayColor.opacity(0.5), radius: 3, x: 2, y: 3)
+            }
+            }
+        }
+        .matchedGeometryEffect(id: "image", in: nameSpace)
+        .transition(.scale(scale: 1))
     }
 }
 

@@ -52,7 +52,7 @@ struct SettingsView: View {
     @State private var showCropView = false
     @Binding var showImageSourceActionSheet: Bool
     @State private var imageSource: UIImagePickerController.SourceType = .photoLibrary
-    @Binding  var showImageBig: Bool
+    @Binding var showImageBig: Bool
     
     // MARK: - LOGOUT ALERT
     @State private var logoutAlert: Bool = false
@@ -206,8 +206,6 @@ extension SettingsView {
                     .foregroundStyle(ColorManager.primaryBasicColor)
                 if !showImageBig {
                     profileImage(size: imageSize)
-                        .matchedGeometryEffect(id: "image", in: nameSpace)
-                        .transition(.scale(scale: 1))
                         .frame(maxWidth: 70, alignment: .center)
                         .padding(.horizontal, Measures.kHomeHorizontalPadding)
                         .offset(x: imageOffsetX,y: -imageOffsetY)
@@ -237,7 +235,7 @@ extension SettingsView {
     @ViewBuilder
     private func profileImage(size: CGFloat) -> some View {
         Button {
-            withAnimation(.easeIn(duration: 0.4)) {
+            withAnimation {
                 showImageBig = true
             }
         } label: {
@@ -302,44 +300,56 @@ extension SettingsView {
     @ViewBuilder
     private func profileImageView(size: CGFloat, image: UIImage?) -> some View {
         // 1. If cropped image we show cropped image
-        if let croppedImage = croppedImage {
-            Image(uiImage: croppedImage)
+        ZStack {
+            Color.clear
+                .overlay {
+            if let croppedImage = croppedImage {
+                Image(uiImage: croppedImage)
+                    .resizable()
+                   
+                    .frame(width: size + 20, height: size + 20)
+                    .background(ColorManager.defaultWhite)
+                    .clipShape(Circle())
+                    .shadow(color: ColorManager.primaryGrayColor.opacity(0.5), radius: 3, x: 2, y: 3)
+                
+                // 2. If image save we show image save
+            } else if let userImage = UserDefaults.standard.userSaved?.profileImageURL, let url = URL(string: userImage) {
+                WebImage(url: url) { phase in
+                    switch phase {
+                    case .empty:
+                        ProgressView()
+                    case .success(let image):
+                        image
+                    case .failure:
+                        LoadingView()
+                    @unknown default:
+                        LoadingView()
+                    }
+                }
                 .resizable()
+     
                 .frame(width: size + 20, height: size + 20)
                 .background(ColorManager.defaultWhite)
                 .clipShape(Circle())
                 .shadow(color: ColorManager.primaryGrayColor.opacity(0.5), radius: 3, x: 2, y: 3)
-        // 2. If image save we show image save
-        } else if let userImage = UserDefaults.standard.userSaved?.profileImageURL, let url = URL(string: userImage) {
-            WebImage(url: url) { phase in
-                switch phase {
-                case .empty:
-                    ProgressView()
-                case .success(let image):
-                    image
-                case .failure:
-                    LoadingView()
-                @unknown default:
-                    LoadingView()
-                }
+                
+                
+                
+                // 3. If no image
+            } else {
+                Image(uiImage: image ?? UIImage())
+                    .resizable()
+                    
+                    .frame(width: croppedImage != nil ? size + 20 : size, height: croppedImage != nil ? size + 20 : size)
+                    .padding(croppedImage != nil ? 0 : 10)
+                    .background(ColorManager.defaultWhite)
+                    .clipShape(Circle())
+                    .shadow(color: ColorManager.primaryGrayColor.opacity(0.5), radius: 3, x: 2, y: 3)
             }
-            .resizable()
-            .frame(width: size + 20, height: size + 20)
-            .background(ColorManager.defaultWhite)
-            .clipShape(Circle())
-            .shadow(color: ColorManager.primaryGrayColor.opacity(0.5), radius: 3, x: 2, y: 3)
-
-            
-        // 3. If no image
-        } else {
-            Image(uiImage: image ?? UIImage())
-                .resizable()
-                .frame(width: croppedImage != nil ? size + 20 : size, height: croppedImage != nil ? size + 20 : size)
-                .padding(croppedImage != nil ? 0 : 10)
-                .background(ColorManager.defaultWhite)
-                .clipShape(Circle())
-                .shadow(color: ColorManager.primaryGrayColor.opacity(0.5), radius: 3, x: 2, y: 3)
+            }
         }
+        .matchedGeometryEffect(id: "image", in: nameSpace, isSource: true)
+        .transition(.scale(scale: 1))
     }
     
     /// Section View
@@ -469,10 +479,11 @@ struct Settings_Previews: PreviewProvider {
             FSCategory(id: "2", name: "Carpintería", is_manual: true),
             FSCategory(id: "3", name: "Clases online", is_manual: false),
         ]
+        @Previewable @State var showImageBig: Bool = false
         UserDefaults.standard.userSaved = User.sampleUser
         mockManager.allSkillsSaved = Skill.sampleArray
         return GeometryReader { proxy in
-            SettingsView(proxy: proxy, showImageSourceActionSheet: .constant(false), showImageBig: .constant(false), nameSpace: Namespace().wrappedValue)
+            SettingsView(proxy: proxy, showImageSourceActionSheet: .constant(false), showImageBig: $showImageBig, nameSpace: Namespace().wrappedValue)
                 .environment(AuthenticatorManager())
                 .environmentObject(mockManager)
                 .ignoresSafeArea()
