@@ -18,7 +18,8 @@ struct TabBarView: View {
     }
     @Binding var isMiddlePressed: Bool
     @State private var isRotated: Bool = false
-    
+    @Environment(Coordinator<MainCoordinatorPages>.self) private var coordinator
+
     // MARK: - BODY
     var body: some View {
         content
@@ -91,7 +92,7 @@ extension TabBarView {
         Button {
             withAnimation(.easeInOut(duration: 0.4)) {
                 isMiddlePressed = true
-                isRotated.toggle()
+                coordinator.push(.newAnnounce)
             }
         } label: {
             Image(.plusIcon)
@@ -100,7 +101,6 @@ extension TabBarView {
                 .frame(width: 30, height: 30)
                 .foregroundStyle(ColorManager.defaultWhite)
                 .padding(20)
-                .rotationEffect(.degrees(isRotated ? 180 : 360))
                 .background(ColorManager.primaryBasicColor)
                 .clipShape(Circle())
                 .shadow(color: ColorManager.primaryGrayColor.opacity(0.3), radius: 2, x: 0, y: -2)

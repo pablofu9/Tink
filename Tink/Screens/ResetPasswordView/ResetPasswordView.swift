@@ -29,16 +29,7 @@ struct ResetPasswordView: View {
             .onDisappear {
                 authenticatorManager.resetAuthErrors()
             }
-            .overlay {
-                if sentEmailDone {
-                    CustomAlert(title: "SIGN_UP_EMAIL_SENT".localized, bodyText: "SIGN_UP_EMAIL_SENT_BODY".localized, acceptAction: {
-                        withAnimation {
-                            sentEmailDone = false
-                            coordinator.pop()
-                        }
-                    }, cancelAction: nil)
-                }
-            }
+            .toast(isShowing: $sentEmailDone, message: "SIGN_UP_CHECK_EMAIL".localized, duration: 2)
     }
 }
 
@@ -131,12 +122,14 @@ extension ResetPasswordView {
     private var resetPasswordButton: some View {
         DefaultButton(horizontalPadding: 10, text: "FORGOT_PASSWORD_BUTTON".localized, action: {
             Task {
-                 authenticatorManager.resetPassword(email: email, goBackAction: {
-                     withAnimation {
-                         focus = false
-                         sentEmailDone = true
-                     }
-                })
+                authenticatorManager.resetPassword(email: email) { success in
+                    DispatchQueue.main.async {
+                        withAnimation {
+                            focus = false
+                            sentEmailDone = success
+                        }
+                    }
+                }
             }
         })
     }

@@ -22,7 +22,7 @@ struct AppSwitcher: View {
                 CoordinatorStack(AuthCoordinatorPages.login)
                     .transition(.move(edge: .bottom))
             } else {
-                MainView()
+                MainCoordinatorStack(MainCoordinatorPages.root)
                     .transition(.move(edge: .bottom))
             }
         }

@@ -15,12 +15,13 @@ struct ChatDetailView: View {
     var chat: Chat
     let userNotUs: User
     @State private var text: String = ""
-    @Environment(\.dismiss) var dismiss
     @EnvironmentObject var chatManager: ChatManager
     @StateObject private var keyboardObserver = KeyboardObserver()
     @FocusState var focus
     let height: Double = 130
-    
+    // Coordinator for navigation
+    @Environment(Coordinator<MainCoordinatorPages>.self) private var coordinator
+
     // MARK: - BODY
     var body: some View {
         GeometryReader { proxy in
@@ -55,6 +56,8 @@ struct ChatDetailView: View {
                     .coordinateSpace(name: "SCROLL")
                 }
             }
+            .navigationBarBackButtonHidden()
+            .navigationBarHidden(true)
             .onTapGesture {
                 focus = false
             }
@@ -95,7 +98,7 @@ extension ChatDetailView {
             let minY = reader.frame(in: .named("SCROLL")).minY
             HStack(spacing: 20) {
                 BackButton(action: {
-                    dismiss()
+                    coordinator.pop()
                 })
                 
                 imageView
@@ -190,10 +193,13 @@ extension ChatDetailView {
 }
 
 #Preview {
+    @Previewable @State  var coordinator = Coordinator<MainCoordinatorPages>()
+
     let chat = [Chat(id: "1", messages: [Message(id: "1", text: "Ultimo mensaje", received: true, timestamp: Date(), users: User.sampleUser.id)], users: [User.userDefaultSample.id])]
     let user = User.sampleUser
     ChatDetailView(chat: chat.first!, userNotUs: user)
         .environmentObject(ChatManager())
+        .environment(coordinator)
 }
 
 

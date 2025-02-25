@@ -47,7 +47,6 @@ extension SignUpView {
     @ViewBuilder
     private var content: some View {
         GeometryReader { proxy in
-            header
             ScrollView(.vertical) {
                 LazyVStack(alignment: .leading ,spacing: 10) {
                     formView
@@ -67,11 +66,14 @@ extension SignUpView {
                     alreadyAccView
                         .padding(.top, 20)
                 }
+                .safeAreaInset(edge: .top) {
+                    EmptyView()
+                        .frame(height: Measures.kTopShapeHeight)
+                }
                 .padding(.horizontal, Measures.kHomeHorizontalPadding)
             }
-            .padding(.top, Measures.kTopShapeHeight)
-            .zIndex(2)
             .scrollBounceBehavior(.basedOnSize)
+            header
         }
         .ignoresSafeArea()
         .background(ColorManager.defaultWhite)
@@ -248,7 +250,7 @@ extension SignUpView {
                 .font(.custom(CustomFonts.regular, size: 16))
                 .foregroundStyle(ColorManager.primaryGrayColor)
                 .lineLimit(1)
-                .minimumScaleFactor(0.8)
+                .minimumScaleFactor(0.6)
             Rectangle()
                 .frame(height: 1)
                 .foregroundStyle(ColorManager.primaryGrayColor)

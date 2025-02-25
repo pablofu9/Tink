@@ -41,15 +41,15 @@ extension ProfileView {
                         skillsView
                         informationView
                     }
+                    .safeAreaTopPadding(proxy: proxy)
                     .safeAreaInset(edge: .top) {
                         EmptyView()
-                            .frame(height: Measures.kTopShapeHeightSmaller - 40)
+                            .frame(height: 70)
                     }
                     .safeAreaInset(edge: .bottom) {
                         EmptyView()
                             .frame(height: Measures.kTabBarHeight + 60)
                     }
-                    .safeAreaTopPadding(proxy: proxy)
                     .overlay(alignment: .top) {
                         profileHeader(proxy)
                     }
@@ -57,6 +57,8 @@ extension ProfileView {
             }
             .coordinateSpace(name: "SCROLL")
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .background(ColorManager.bgColor)
         .sheet(item: $selectedSkillToModify, onDismiss: {
             Task {
                 databaseManager.loading = true
@@ -65,38 +67,29 @@ extension ProfileView {
                 try await databaseManager.syncSkills()
             }
         }) { skill in
-            NewSkillView(isMiddlePressed: .constant(false), skill: skill)
+            NewSkillView(skill: skill)
         }
         .onDisappear {
             databaseManager.currentIndex = 0
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(ColorManager.bgColor)
     }
     
     /// Header View
     @ViewBuilder
     private func profileHeader(_ proxy: GeometryProxy) -> some View {
-        let height = Measures.kTopShapeHeightSmaller
+        let height: Double = 90
         GeometryReader { reader in
             let minY = reader.frame(in: .named("SCROLL")).minY
-            let dynamicHeight = max(105, max(height + (minY < 0 ? minY : 0), 0))
-            let textOffsetY = max(-22, min(0, minY * 0.2))
-            let progressShape = min(max((minY + 70) / 40, 0), 1)
-            ZStack(alignment: .trailing) {
-                TopShape(progress: progressShape)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: dynamicHeight, alignment: .top)
-                    .foregroundStyle(ColorManager.primaryBasicColor)
+            VStack(alignment: .leading) {
                 Text("PROFILE_HEADER".localized)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .font(.custom(CustomFonts.bold, size: 30))
                     .foregroundStyle(ColorManager.defaultWhite)
                     .padding(.horizontal, Measures.kHomeHorizontalPadding)
-                    .offset(y: -textOffsetY)
+                    .padding(.top, proxy.safeAreaInsets.top)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .frame(height: dynamicHeight, alignment: .top)
+            .frame(maxWidth: .infinity, maxHeight: 100, alignment: .topLeading)
+            .background(ColorManager.primaryBasicColor)
             .offset(y: -minY)
 
         }

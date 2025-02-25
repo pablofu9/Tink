@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Message: Identifiable, Codable, Hashable {
+struct Message: Identifiable, Codable, Hashable, Equatable {
     var id: String
     var text: String
     var received: Bool
@@ -15,7 +15,7 @@ struct Message: Identifiable, Codable, Hashable {
     var users: String
 }
 
-struct Chat: Identifiable, Codable {
+struct Chat: Identifiable, Codable, Equatable, Hashable {
     var id: String
     var messages: [Message]
     var users: [String]

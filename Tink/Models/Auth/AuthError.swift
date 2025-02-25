@@ -79,6 +79,7 @@ enum AuthErrorSignUp: LocalizedError, Equatable {
 enum AuthErrorResetPassword: LocalizedError, Equatable {
     case emptyEmail
     case custom(message: String)
+    case wrongEmail
 
     var errorDescription: String {
         switch self {
@@ -86,6 +87,8 @@ enum AuthErrorResetPassword: LocalizedError, Equatable {
             return "LOGIN_ERROR_EMAIL".localized
         case .custom(message: let message):
             return message
+        case .wrongEmail:
+            return "LOGIN_ERROR_INVALID".localized
         }
     }
 }

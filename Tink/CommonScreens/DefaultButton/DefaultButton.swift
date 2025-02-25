@@ -12,11 +12,13 @@ struct DefaultButton: View {
     let text: String
     let horizontalPadding: CGFloat
     let action: () -> Void
+    var radius: CGFloat = 25
     
-    init(horizontalPadding: CGFloat = Measures.kHomeHorizontalPadding, text: String, action: @escaping () -> Void) {
+    init(horizontalPadding: CGFloat = Measures.kHomeHorizontalPadding, text: String, action: @escaping () -> Void, radius: CGFloat = 25) {
         self.horizontalPadding = horizontalPadding
         self.text = text
         self.action = action
+        self.radius = radius
     }
     
     var body: some View {
@@ -29,7 +31,7 @@ struct DefaultButton: View {
                 .foregroundStyle(ColorManager.defaultWhite)
                 .font(.custom(CustomFonts.bold, size: 25))
                 .background(ColorManager.primaryBasicColor)
-                .clipShape(RoundedRectangle(cornerRadius: 25))
+                .clipShape(RoundedRectangle(cornerRadius: radius))
                 .padding(.horizontal, horizontalPadding)
         }
     }

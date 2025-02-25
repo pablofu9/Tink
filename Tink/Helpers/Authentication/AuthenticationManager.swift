@@ -104,23 +104,39 @@ class AuthenticatorManager: NSObject, ASAuthorizationControllerDelegate {
     }
     
     @MainActor
-    func resetPassword(email: String, goBackAction: @escaping () -> Void) {
-        // 1. Empty email error
+    func resetPassword(email: String, completion: @escaping (Bool) -> Void) {
+        // 1. Check if the email is empty
         guard !email.isEmpty else {
             authErrorResetPass = .emptyEmail
+            completion(false)
             return
         }
         
+        // 2. Validate email format
+        guard isValidEmail(email) else {
+            authErrorResetPass = .wrongEmail
+            completion(false)
+            return
+        }
+        
+        // 3. Attempt to send the password reset email
         Auth.auth().sendPasswordReset(withEmail: email) { error in
             if let error {
-                // 2. Custom Error
+                // Custom error handling
                 self.authErrorResetPass = .custom(message: error.localizedDescription)
+                completion(false)
             } else {
-                // 3. No error we go back in view
+                // No errors, mark as success
                 self.authErrorResetPass = nil
-                goBackAction()
+                completion(true)
             }
         }
+    }
+    
+    /// **Validates email format using a regular expression**
+    func isValidEmail(_ email: String) -> Bool {
+        let emailRegex = #"^[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$"#
+        return NSPredicate(format: "SELF MATCHES %@", emailRegex).evaluate(with: email)
     }
     
     /// Reset auth errors

@@ -14,8 +14,9 @@ struct ChatRowView: View {
     let chat: Chat
     @EnvironmentObject var databaseManager: FSDatabaseManager
     @State var user: User?
-    @State var isPresented: Bool = false
-    
+    // Coordinator for navigation
+    @Environment(Coordinator<MainCoordinatorPages>.self) private var coordinator
+
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 15) {
@@ -43,7 +44,7 @@ struct ChatRowView: View {
                                 .font(.custom(CustomFonts.regular, size: 16))
                                 .foregroundStyle(ColorManager.primaryGrayColor.opacity(0.7))
                             Spacer()
-                     
+                            
                         }
                     }
                 }
@@ -54,18 +55,15 @@ struct ChatRowView: View {
                 .foregroundStyle(ColorManager.primaryBasicColor.opacity(0.3))
         }
         .onTapGesture {
-            isPresented = true
+            if let user {
+                coordinator.push(.chatDetail(chat: chat, user: user))
+            }
         }
         .onAppear {
             Task {
                 if let idNotUs = chat.users.first(where: {$0 != UserDefaults.standard.userSaved?.id}) {
                     user = try await databaseManager.getUser(userID: idNotUs)
                 }
-            }
-        }
-        .fullScreenCover(isPresented: $isPresented) {
-            if let user {
-                ChatDetailView(chat: chat, userNotUs: user)
             }
         }
     }
@@ -105,8 +103,11 @@ struct ChatRowView: View {
 
 
 #Preview {
+    @Previewable @State  var coordinator = Coordinator<MainCoordinatorPages>()
+
     let chat = [Chat(id: "1", messages: [Message(id: "1", text: "Ultimo mensaje", received: true, timestamp: Date(), users: User.sampleUser.id)], users: [User.sampleUser.id])]
     UserDefaults.standard.userSaved = User.userDefaultSample
     return ChatRowView(chat: chat.first!)
+        .environment(coordinator)
         .environmentObject(FSDatabaseManager())
 }

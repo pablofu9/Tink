@@ -8,7 +8,7 @@
 import Foundation
 
 // MARK: - USER
-struct User: Identifiable, Codable {
+struct User: Identifiable, Codable, Equatable, Hashable {
     var id: String
     var name: String
     var email: String

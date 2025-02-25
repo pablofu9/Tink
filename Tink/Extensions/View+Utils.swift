@@ -58,3 +58,10 @@ enum Crop: Equatable {
         }
     }
 }
+
+// MARK: - TOAST EXTENSION
+extension View {
+    func toast(isShowing: Binding<Bool>, message: String, duration: TimeInterval = 2.0) -> some View {
+        self.modifier(ToastModifier(isShowing: isShowing, message: message, duration: duration))
+    }
+}

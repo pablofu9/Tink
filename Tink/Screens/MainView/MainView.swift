@@ -25,15 +25,13 @@ struct MainView: View {
     @State var showImageView: Bool = false
     @State var showImageSourceActionSheet: Bool = false
     @Environment(AuthenticatorManager.self) private var authenticatorManager
+    @Environment(Coordinator<MainCoordinatorPages>.self) private var coordinator
 
     // MARK: - MATCHED GEOMETRY EFFECT
     @Namespace var animation
     
     var body: some View {
         content
-            .fullScreenCover(isPresented: $isMiddlePressed) {
-                NewSkillView(isMiddlePressed: $isMiddlePressed)
-            }
             .overlay {
                 if databaseManager.loading {
                     LoadingView()
@@ -111,8 +109,11 @@ extension MainView {
 }
 
 #Preview {
+    @Previewable @State  var coordinator = Coordinator<MainCoordinatorPages>()
+
     MainView()
         .environmentObject(FSDatabaseManager())
         .environment(AuthenticatorManager())
+        .environment(coordinator)
 }
 

@@ -63,7 +63,8 @@
 "SIGN_UP_BUTTON"                                = "Regístrate";
 "SIGN_UP_ALREADY_ACC"                           = "¿Ya tienes cuenta?";
 "SIGN_UP_EMAIL_SENT"                            = "Correo enviado";
-"SIGN_UP_EMAIL_SENT_BODY"                       = "Siga las instrucciones que le han llegado al correo para recuperar la contraseña";
+"SIGN_UP_EMAIL_SENT_BODY"                       = "Introduce tu email para recuperar tu contraseña";
+"SIGN_UP_CHECK_EMAIL"                           = "Revisa tu correo";
 
 
 

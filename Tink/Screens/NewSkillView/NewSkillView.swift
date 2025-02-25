@@ -34,10 +34,7 @@ struct NewSkillView: View {
             return self.rawValue
         }
     }
-    
-    // MARK: - VIEW PRESENTED FLAG
-    @Binding var isMiddlePressed: Bool
-    
+        
     // MARK: - TEXTFIELD VARIABLES
     @State private var skillName: String = ""
     @State private var skillDescription: String = ""
@@ -65,6 +62,9 @@ struct NewSkillView: View {
     
     // MARK: - DELETE BUTTON
     @State private var showAlertDeleteButton: Bool = false
+    
+    // MARK: - NAVIGATION COORDINATOR
+    @Environment(Coordinator<MainCoordinatorPages>.self) private var coordinator
 
     // MARK: - BODY
     var body: some View {
@@ -92,6 +92,8 @@ struct NewSkillView: View {
                     .transition(.move(edge: .top).combined(with: .opacity))
                 }
             }
+            .navigationBarHidden(true)
+            .navigationBarBackButtonHidden()
     }
 }
 
@@ -223,7 +225,7 @@ extension NewSkillView {
                 if skill != nil {
                     dismiss()
                 } else {
-                    isMiddlePressed = false
+                    coordinator.pop()
                 }
             }
         })
@@ -480,9 +482,9 @@ extension NewSkillView {
     /// Create announce func
     private func createNewAnnounce() {
         Task {
-            // 1. Change isMiddle pressed a false al terminar ejecucion
+            // 1. Dismiss on announce created
             defer {
-                isMiddlePressed = false
+                coordinator.pop()
             }
             
             do {
@@ -540,7 +542,7 @@ struct NewSkillView_Previews: PreviewProvider {
             FSCategory(id: "3", name: "Clases online", is_manual: false),
         ]
         
-        return NewSkillView(isMiddlePressed: $isMiddlePressed, skill: Skill.sample)
+        return NewSkillView(skill: Skill.sample)
             .environmentObject(mockManager)
             .ignoresSafeArea()
         
