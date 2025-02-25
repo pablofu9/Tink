@@ -485,6 +485,7 @@ extension SettingsView {
         Task {
             try await authenticatorManager.deleteAccount()
             try await databaseManager.deleteAccount()
+            try await databaseManager.deleteChats()
             try authenticatorManager.signOut()
         }
     }

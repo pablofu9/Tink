@@ -293,7 +293,51 @@ extension FSDatabaseManager {
              print("Error deleting account: \(error.localizedDescription)")
              throw error
          }
-     
+    }
+    
+    /// Deletes all chats that contain a specific user ID in the `users` array field within the Firestore `chats` collection.
+    ///
+    /// - Throws: An error if there is any issue while fetching the documents or deleting them from Firestore.
+    ///
+    /// This method does the following:
+    /// 1. Queries the Firestore `chats` collection for all documents where the `users` array contains the given `userId`.
+    /// 2. If no matching chats are found, it prints a message and exits early.
+    /// 3. For each document in the query result, the method deletes the document from Firestore.
+    /// 4. It handles loading state and error handling for the operation.
+    func deleteChats() async throws {
+        // Set the loading state to true before starting the process and false when done
+        loading = true
+        defer { loading = false }
+
+        // Check if there is a saved user in UserDefaults
+        guard let user = UserDefaults.standard.userSaved else {
+            return  // Exit early if no user is found
+        }
+        let db = Firestore.firestore()
+        do {
+            // Query Firestore for chats where the userId exists in the "users" array
+            let querySnapshot = try await db.collection("chats")
+                .whereField("users", arrayContains: user.id) // Query for chats containing the userId in the "users" array
+                .getDocuments()
+
+            // Check if the query found any matching chat documents
+            guard !querySnapshot.documents.isEmpty else {
+                print("No chats found for userId \(user.id)") // Inform the user if no chats were found
+                return
+            }
+
+            // Loop through each document (chat) that matches the query
+            for document in querySnapshot.documents {
+                // Delete the chat document from Firestore
+                try await document.reference.delete()  // Deletes the document from Firestore
+                print("Deleted chat with ID: \(document.documentID)") // Log the deleted chat's document ID
+            }
+
+        } catch {
+            // If an error occurs, log the error message and re-throw the error
+            print("Error deleting chats: \(error.localizedDescription)")
+            throw error  // Propagate the error for further handling
+        }
     }
     
     /// Update name
