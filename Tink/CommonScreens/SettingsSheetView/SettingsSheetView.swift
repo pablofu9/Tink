@@ -18,12 +18,16 @@ struct SettingsSheetView: View {
             BackButton(action: {
                 dismiss()
             })
-            Text(header)
-                .font(.custom(CustomFonts.bold, size: 22))
-                .foregroundStyle(ColorManager.defaultBlack)
-            Text(bodyText)
-                .font(.custom(CustomFonts.regular, size: 18))
-                .foregroundStyle(ColorManager.primaryGrayColor.opacity(0.7))
+            ScrollView {
+                VStack(alignment: .leading, spacing: 30) {
+                    Text(header)
+                        .font(.custom(CustomFonts.bold, size: 22))
+                        .foregroundStyle(ColorManager.defaultBlack)
+                    Text(bodyText)
+                        .font(.custom(CustomFonts.regular, size: 18))
+                        .foregroundStyle(ColorManager.primaryGrayColor.opacity(0.7))
+                }
+            }
         }
         .padding(.top, 40)
         .padding(.horizontal, Measures.kHomeHorizontalPadding)

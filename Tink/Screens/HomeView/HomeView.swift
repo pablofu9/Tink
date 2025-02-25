@@ -51,6 +51,7 @@ struct HomeView: View {
     @State private var selectedSkill: Skill?
     // Active tab
     @Binding var activeTab: TabModel
+    
     // MARK: - BODY
     var body: some View {
         ZStack(alignment: .top) {
@@ -67,7 +68,7 @@ struct HomeView: View {
                     }
                     .safeAreaInset(edge: .top) {
                         EmptyView()
-                            .frame(height: Measures.kTopShapeHeightSmaller + (filterDeploy == nil ? -30 : 0))
+                        .frame(height: Measures.kTopShapeHeightSmaller + (filterDeploy == nil ? (UIScreen.main.bounds.size.height < 700 ? 20 : -30) : (UIScreen.main.bounds.size.height < 700 ? 50 : 0)))
                     }
                     .safeAreaTopPadding(proxy: proxy)
                     .overlay(alignment: .top) {
@@ -99,6 +100,7 @@ struct HomeView: View {
             .onAppear {
                 Task {
                     try await databaseManager.syncSkills()
+                    await databaseManager.fetchCategories()
                 }
             }
            
@@ -122,14 +124,17 @@ extension HomeView {
             let minY = reader.frame(in: .named("SCROLL")).minY
             let progress = minY / (height * (minY > 0 ? 0.5 : 0.6))
             let interpolatedOpacity = max(0, min(1, 1 + progress))
+            let invertedOpacity = (1 - interpolatedOpacity) / 2
             VStack(spacing: 15) {
               
                 Color.clear
                     .frame(height: max(35, proxy.safeAreaInsets.top + progress * 20))
-               
+                
                 searcherTextfield
                     .padding(.horizontal, Measures.kHomeHorizontalPadding)
+                    .shadow(color: ColorManager.primaryGrayColor.opacity(invertedOpacity), radius: 2, x: 0, y: 2)
                 VStack(alignment: .leading ,spacing: 10) {
+                   
                     VStack(alignment: .leading, spacing: 3) {
                         filterHeader(.categories, content: {
                             CategoryCapsuleView(selectedCategories: $selectedCategories, categories: databaseManager.categories)
@@ -143,8 +148,9 @@ extension HomeView {
                             .onAppear {
                                 Task {
                                     databaseManager.loading = true
-                                    try await Task.sleep(nanoseconds: 2_000_000_000)
+                                    try await Task.sleep(nanoseconds: 1_000_000_000)
                                     try await databaseManager.syncSkills()
+                                    await databaseManager.fetchCategories()
                                 }
                             }
                     }

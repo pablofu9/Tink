@@ -126,7 +126,7 @@ struct SettingsView: View {
                 .safeAreaTopPadding(proxy: proxy)
                 .safeAreaInset(edge: .bottom) {
                     EmptyView()
-                        .frame(height: UIScreen.main.bounds.size.height < 700 ?  Measures.kTabBarHeight - 20:  Measures.kTabBarHeight + 90)
+                        .frame(height: UIScreen.main.bounds.size.height < 700 ?  Measures.kTabBarHeight + 30:  Measures.kTabBarHeight + 90)
                 }
                 .safeAreaInset(edge: .top) {
                     EmptyView()
@@ -367,9 +367,7 @@ extension SettingsView {
     /// Row View
     @ViewBuilder
     private func rowView(_ text: String, image: ImageResource, action: @escaping () -> Void, isNotifications: Bool = false) -> some View {
-        Button {
-            action()
-        } label: {
+        if isNotifications {
             HStack(spacing: 10) {
                 Image(image)
                     .resizable()
@@ -392,7 +390,28 @@ extension SettingsView {
                         .rotationEffect(.degrees(180))
                         .foregroundStyle(ColorManager.primaryGrayColor.opacity(0.9))
                 }
-              
+            }
+        } else {
+            Button {
+                action()
+            } label: {
+                HStack(spacing: 10) {
+                    Image(image)
+                        .resizable()
+                        .renderingMode(.template)
+                        .frame(width: 30, height: 30)
+                        .foregroundStyle(ColorManager.primaryGrayColor.opacity(0.9))
+                    Text(text)
+                        .font(.custom(CustomFonts.medium, size: 17))
+                        .foregroundStyle(ColorManager.primaryGrayColor.opacity(0.9))
+                    Spacer()
+                    Image(.backIcon)
+                        .resizable()
+                        .renderingMode(.template)
+                        .frame(width: 30, height: 30)
+                        .rotationEffect(.degrees(180))
+                        .foregroundStyle(ColorManager.primaryGrayColor.opacity(0.9))
+                }
             }
         }
     }
