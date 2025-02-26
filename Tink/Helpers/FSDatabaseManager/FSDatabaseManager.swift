@@ -198,54 +198,6 @@ class FSDatabaseManager: ObservableObject {
 // MARK: - USER MANAGEMENT
 extension FSDatabaseManager {
     
-    /// Function to check if user already exists
-    func handleUserInFirestore() {
-        loading = true
-        defer { loading = false }
-        // 1. Check if user is authenticated
-        guard let user = Auth.auth().currentUser else {
-            print("No user authenticated")
-            return
-        }
-        
-        let db = Firestore.firestore()
-        let userRef = db.collection("users").document(user.uid)
-        
-        userRef.getDocument { document, error in
-            // 3. User doesn't exist, create it
-            let name = (user.displayName?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false)
-            ? user.displayName!
-            : user.email?.components(separatedBy: "@").first ?? ""
-            
-            var saveUser = User(id: user.uid, name: name, email: user.email ?? "", profileImageURL: "")
-            
-            if let document = document, document.exists {
-                print("User already exists in firestore. - Do nothing")
-                if let data = document.data(),
-                   let profileImageURL = data["profileImageURL"] as? String {
-                    saveUser.profileImageURL = profileImageURL
-                }
-            } else {
-                do {
-                    let encodedUser = try Firestore.Encoder().encode(saveUser)
-                    
-                    // 4. Save user in Firestore
-                    userRef.setData(encodedUser, merge: true) { error in
-                        if let error = error {
-                            print("Error saving user in firestore: \(error.localizedDescription)")
-                        } else {
-                            print("User saved in firestore correctly.")
-                            
-                        }
-                    }
-                } catch {
-                    print("Codification Error: \(error.localizedDescription)")
-                }
-            }
-            UserDefaults.standard.userSaved = saveUser
-        }
-    }
-    
     func getUser(userID: String) async throws -> User? {
         let firestore = Firestore.firestore()
             
@@ -455,18 +407,5 @@ extension FSDatabaseManager {
         } catch {
             print("Erro updating skills")
         }
-    }
-}
-
-// MOCK FOR PREVIEWS
-final class FSDatabaseManagerMock: FSDatabaseManager {
-    
-    override init() {
-        super.init()
-        self.categories = [
-            FSCategory(id: "1", name: "Albañilería", is_manual: true),
-            FSCategory(id: "2", name: "Carpintería", is_manual: true),
-            FSCategory(id: "3", name: "Clases online", is_manual: false),
-        ]
     }
 }

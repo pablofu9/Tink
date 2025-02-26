@@ -68,7 +68,7 @@ struct MainView: View {
             }
             .onAppear {
                 Task {
-                    databaseManager.handleUserInFirestore()
+                    authenticatorManager.handleUserInFirestore()
                 }
             }
     }

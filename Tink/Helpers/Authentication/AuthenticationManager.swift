@@ -23,7 +23,7 @@ class AuthenticatorManager: NSObject, ASAuthorizationControllerDelegate {
     var finishCheckAuth: Bool = false
     private var currentNonce: String?
     let initialService = InitialService()
-    
+    var loading = false
     /// We watch for the auth status
     @MainActor
     func startListeningToAuthState() async {
@@ -190,6 +190,64 @@ class AuthenticatorManager: NSObject, ASAuthorizationControllerDelegate {
                     completion(.failure(error))
                 } else {
                     completion(.success(true))
+                }
+            }
+        }
+    }
+    
+    /// Function to check if user already exists
+    func handleUserInFirestore() {
+        loading = true
+        defer { loading = false }
+        // 1. Check if user is authenticated
+        guard let user = Auth.auth().currentUser else {
+            print("No user authenticated")
+            return
+        }
+        guard UserDefaults.standard.userSaved == nil else {
+            print("User already saved in UD")
+            return
+        }
+        
+        let db = Firestore.firestore()
+        let userRef = db.collection("users").document(user.uid)
+        
+        // 3. Get document in Users
+        userRef.getDocument { document, error in
+            if let document = document, document.exists {
+                // 3.1. User exist in firestore ->
+                do {
+                    print("User already exist save in firestore")
+                    let user = try document.data(as: User.self)
+                    UserDefaults.standard.userSaved = user
+                } catch {
+                    print("Error decoding user: \(error.localizedDescription)")
+                }
+            } else {
+                // 3.2. User doesnt exist in firestore ->
+                let name =  (user.displayName?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false)
+                ? user.displayName!
+                : user.email?.components(separatedBy: "@").first ?? ""
+                let savedUser = User(id: user.uid, name: name, email: user.email ?? "")
+                do {
+                    let encondedUser = try Firestore.Encoder().encode(savedUser)
+                    // 4. Saved new user in firestore
+                    userRef.setData(encondedUser, merge: true) { error in
+                        if let error {
+                            print("Error saving new user in firestore", error)
+                            Task {
+                                try self.signOut()
+                            }
+                        } else {
+                            print("User saved correctly")
+                            UserDefaults.standard.userSaved = savedUser
+                        }
+                    }
+                } catch {
+                    Task {
+                        try self.signOut()
+                    }
+                    print("Error decoding User")
                 }
             }
         }
