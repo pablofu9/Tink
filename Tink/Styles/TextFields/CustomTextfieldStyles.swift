@@ -10,6 +10,7 @@ import SwiftUI
 
 struct SearcherTextfieldStyle: TextFieldStyle {
     
+    var focused: Bool
     
     func _body(configuration: TextField<Self._Label>) -> some View {
         configuration
@@ -21,11 +22,17 @@ struct SearcherTextfieldStyle: TextFieldStyle {
             .padding(.vertical, 8)
             .background(ColorManager.defaultWhite)
             .autocorrectionDisabled()
-            .clipShape(RoundedRectangle(cornerRadius: 15))
+            .clipShape(Capsule())
             .minimumScaleFactor(0.9)
+            .background {
+                Capsule()
+                    .stroke(lineWidth: focused ? 2 : 1)
+                    .foregroundStyle(focused ? ColorManager.primaryBasicColor : ColorManager.primaryGrayColor.opacity(0.7))
+                    .animation(.easeInOut(duration: 0.3), value: focused)
+            }
             .overlay(alignment: .leading) {
                 Image(systemName: "magnifyingglass")
-                    .foregroundStyle(ColorManager.primaryGrayColor.opacity(0.4))
+                    .foregroundStyle(ColorManager.primaryGrayColor.opacity(0.7))
                     .padding(.leading, 15)
             }
     }
@@ -85,7 +92,7 @@ struct LoginTextField: TextFieldStyle {
     ZStack {
         ColorManager.bgColor
         TextField("", text: $text)
-            .textFieldStyle(SearcherTextfieldStyle())
+            .textFieldStyle(SearcherTextfieldStyle(focused: false))
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .background(Color.gray)

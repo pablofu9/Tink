@@ -148,6 +148,8 @@ struct SettingsView: View {
                     acceptAction: {
                         Task {
                             try authenticatorManager.signOut()
+                            databaseManager.allSkillsSaved = []
+                            databaseManager.skillsSaved = []
                         }
                     },
                     cancelAction: {
@@ -486,6 +488,8 @@ extension SettingsView {
             try await authenticatorManager.deleteAccount()
             try await databaseManager.deleteAccount()
             try await databaseManager.deleteChats()
+            databaseManager.allSkillsSaved = []
+            databaseManager.skillsSaved = []
             try authenticatorManager.signOut()
         }
     }

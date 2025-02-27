@@ -40,6 +40,7 @@
 "CROP"                                          = "Recortar";
 "EDIT"                                          = "Editar";
 "EMPTY_SKILLS"                                  = "¡Ups! Aún no hay habilidades por aquí. 🚀";
+"DELETE_FILTER"                                 = "Eliminar filtros";
 
 /*************************************/
 // MARK: - LOGIN VIEW
