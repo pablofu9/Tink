@@ -490,6 +490,7 @@ extension SettingsView {
             try await databaseManager.deleteChats()
             databaseManager.allSkillsSaved = []
             databaseManager.skillsSaved = []
+           
             try authenticatorManager.signOut()
         }
     }

@@ -17,6 +17,7 @@ struct ChatRowView: View {
     // Coordinator for navigation
     @Environment(Coordinator<MainCoordinatorPages>.self) private var coordinator
 
+    // MARK: - BODY
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 15) {
@@ -34,9 +35,6 @@ struct ChatRowView: View {
                                 .foregroundStyle(ColorManager.primaryGrayColor.opacity(0.7))
                         }
                     }
-                    Text(user?.email ?? "")
-                        .font(.custom(CustomFonts.regular, size: 16))
-                        .foregroundStyle(ColorManager.primaryGrayColor)
                     HStack {
                         if let lastMessageNotUs = chat.messages.last(where: {$0.users != UserDefaults.standard.userSaved?.id}) {
                             
@@ -44,7 +42,15 @@ struct ChatRowView: View {
                                 .font(.custom(CustomFonts.regular, size: 16))
                                 .foregroundStyle(ColorManager.primaryGrayColor.opacity(0.7))
                             Spacer()
-                            
+                            let messagesNotRead = chat.messages.count(where: { !$0.received && $0.users != UserDefaults.standard.userSaved?.id })
+                            if messagesNotRead > 0 {
+                                Text("\(messagesNotRead)")
+                                    .font(.custom(CustomFonts.medium, size: 17))
+                                    .foregroundStyle(ColorManager.defaultBlack)
+                                    .padding(10)
+                                    .background(ColorManager.cancelColor)
+                                    .clipShape(Circle())
+                            }
                         }
                     }
                 }
@@ -68,6 +74,7 @@ struct ChatRowView: View {
         }
     }
     
+    /// Image view
     @ViewBuilder
     private var imageView: some View {
         if let user, let userImage = user.profileImageURL, let url = URL(string: userImage) {

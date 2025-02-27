@@ -82,6 +82,7 @@ struct ChatDetailView: View {
                     try await chatManager.deleteChat(chat)
                    
                 }
+                try await chatManager.changeReadMessage(chat: chat)
             }
             chatManager.stopObservingMessages()
         }
@@ -91,9 +92,9 @@ struct ChatDetailView: View {
 // MARK: - SUBVIEWS
 extension ChatDetailView {
     
+    /// Header view
     @ViewBuilder
     private func headerView(_ proxy: GeometryProxy) -> some View {
-       
         GeometryReader { reader in
             let minY = reader.frame(in: .named("SCROLL")).minY
             HStack(spacing: 20) {
@@ -102,7 +103,7 @@ extension ChatDetailView {
                 })
                 
                 imageView
-                    
+                
                 Text(userNotUs.name)
                     .foregroundStyle(ColorManager.defaultWhite)
                     .font(.custom(CustomFonts.regular, size: 17))
@@ -116,9 +117,9 @@ extension ChatDetailView {
             .offset(y: -minY)
         }
         .frame(height: height)
-       
     }
     
+    /// Profile image view
     @ViewBuilder
     private var imageView: some View {
         if let userImage = userNotUs.profileImageURL, let url = URL(string: userImage) {
@@ -150,6 +151,7 @@ extension ChatDetailView {
         }
     }
     
+    /// Text field custom
     @ViewBuilder
     private var textfieldCustom: some View {
         HStack {

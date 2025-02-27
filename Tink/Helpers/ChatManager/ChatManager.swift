@@ -91,6 +91,7 @@ class ChatManager: ObservableObject {
                     DispatchQueue.main.async {
                         self.messages = chat.messages
                     }
+                  
                 } catch {
                     print("Error decoding chat messages: \(error.localizedDescription)")
                 }
@@ -217,6 +218,48 @@ class ChatManager: ObservableObject {
         }
     }
     
+    /// Updates the 'received' status of messages in the current chat when the user has read them.
+    /// It marks messages as received for messages that are not sent by the current user.
+    /// The changes are reflected both locally and in Firestore.
+    ///
+    /// - Throws: An error if updating the messages in Firestore or encoding the data fails.
+    func changeReadMessage(chat: Chat) async throws {
+        // Check if there are any messages in the current chat
+        if !messages.isEmpty {
+            // Create an updated list of messages, marking as received only those that have 'received' == false
+            let updatedMessages = messages.map { message -> Message in
+                // If the message is not sent by the current user and it's not already marked as 'received', mark it as received
+                if message.users != UserDefaults.standard.userSaved?.id && !message.received {
+                    var updatedMessage = message
+                    updatedMessage.received = true
+                    return updatedMessage
+                }
+                // If the message is already marked as 'received' or is sent by the current user, keep it unchanged
+                return message
+            }
+            
+            let chatRef = db.collection("chats").document(chat.id)
+            let updatedData: [String: Any] = [
+                "messages": updatedMessages.map { message in
+                    return [
+                        "id": message.id,
+                        "text": message.text,
+                        "users": message.users,
+                        "received": message.received,
+                        "timestamp": message.timestamp
+                    ]
+                }
+            ]
+            do {
+                try await chatRef.updateData(updatedData)
+                print("Updated messaged")
+            } catch {
+                print("Error updating messaging", error)
+            }
+        }
+    }
+
+        
     /// Deletes a chat from Firestore if the current user is part of it.
     /// - Parameter chat: The `Chat` object to be deleted.
     /// - Throws: An error if the chat deletion fails.
@@ -242,6 +285,5 @@ class ChatManager: ObservableObject {
             throw NSError(domain: "FirestoreError", code: 500, userInfo: [NSLocalizedDescriptionKey: "Error deleting chat: \(error.localizedDescription)"])
         }
     }
-    
-    
 }
+

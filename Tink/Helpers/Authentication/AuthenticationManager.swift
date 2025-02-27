@@ -155,6 +155,8 @@ class AuthenticatorManager: NSObject, ASAuthorizationControllerDelegate {
     func deleteAccount() async throws {
         guard let user = Auth.auth().currentUser else { return }
         do {
+            let publicId = "user_\(user.uid)"
+            CloudinaryManager.shared.deleteImage(publicId: publicId)
             try await user.delete()
             print("Account deleted from firebase with success!!")
         } catch {

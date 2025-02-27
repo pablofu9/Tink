@@ -108,6 +108,7 @@ class FSDatabaseManager: ObservableObject {
             print("No hay usuario guardado")
             return
         }
+        self.skillsSaved = []
         let db = Firestore.firestore()
         let query = db.collection("skills")
         do {
