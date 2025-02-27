@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Skill: Codable, Identifiable, Equatable {
+struct Skill: Codable, Identifiable, Equatable, Hashable {
     var id: String
     var name: String
     var description: String

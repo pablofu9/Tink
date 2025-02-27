@@ -15,7 +15,8 @@ enum MainCoordinatorPages: Coordinatable, Equatable {
     case root
     case newAnnounce
     case chatDetail(chat: Chat, user: User)
-
+    case skillDetail(skill: Skill, activeTab: Binding<TabModel>)
+    
     var body: some View {
         switch self {
         case .root:
@@ -24,6 +25,8 @@ enum MainCoordinatorPages: Coordinatable, Equatable {
             NewSkillView()
         case .chatDetail(let chat, let user):
             ChatDetailView(chat: chat, userNotUs: user)
+        case .skillDetail(let skill, let activeTab):
+            SkillDetailView(skill: skill, activeTab: activeTab)
         }
     }
 
@@ -52,6 +55,8 @@ enum MainCoordinatorPages: Coordinatable, Equatable {
             hasher.combine("chatDetail")
             hasher.combine(chat)
             hasher.combine(user)
+        case let .skillDetail(skill, _):
+            hasher.combine(skill)
         }
     }
 }

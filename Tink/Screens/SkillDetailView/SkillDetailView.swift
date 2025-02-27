@@ -10,17 +10,15 @@ import SDWebImageSwiftUI
 
 struct SkillDetailView: View {
     
-    // MARK: - SKILL PROPERTY
+    // SKILL PROPERTY
     let skill: Skill
-    @Environment(\.dismiss) private var dismiss
-    @State var offsetX: CGFloat = .zero
-    var computedOpacity: CGFloat {
-        return 1 - min(abs(offsetX) / 200, 1)
-    }
+    // Chat manager
     @EnvironmentObject var chatManager: ChatManager
     // Active tab
     @Binding var activeTab: TabModel
-    
+    // Coordinator navigation
+    @Environment(Coordinator<MainCoordinatorPages>.self) private var coordinator
+
     // MARK: - BODY
     var body: some View {
         GeometryReader { reader in
@@ -46,38 +44,17 @@ struct SkillDetailView: View {
                         headerView(reader)
                     }
                 }
-                .scrollDisabled(offsetX != .zero)
                 .scrollBounceBehavior(.basedOnSize)
                 .coordinateSpace(name: "SCROLL")
                 .scrollIndicators(.hidden)
             }
+            .navigationBarBackButtonHidden()
+            .navigationBarHidden(true)
             .ignoresSafeArea()
         }
   
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(ColorManager.bgColor)
-        .gesture(
-            DragGesture()
-                .onChanged { value in
-                    if value.translation.width > 0 {
-                        withAnimation(.easeInOut(duration: 0.4)) {
-                            offsetX = value.translation.width
-                        }
-                    }
-                }
-                .onEnded { value in
-                    if value.translation.width < 140 {
-                        withAnimation(.easeInOut(duration: 0.4)) {
-                            offsetX = .zero
-                        }
-                    } else {
-                        withAnimation(.easeInOut(duration: 0.4)) {
-                            offsetX = .zero
-                            dismiss()
-                        }
-                    }
-                }
-        )
     }
 }
 
@@ -168,7 +145,7 @@ extension SkillDetailView {
     private var backIcon: some View {
         BackButton(action: {
             withAnimation(.easeInOut(duration: 0.3)) {
-                dismiss()
+                coordinator.pop()
             }
         })
     }
@@ -300,7 +277,7 @@ extension SkillDetailView {
                 Button {
                     Task {
                         try await chatManager.createChat(with: skill.user)
-                        dismiss()
+                        coordinator.pop()
                         activeTab = .chat
                     }
                 } label: {
@@ -359,5 +336,8 @@ extension SkillDetailView {
 }
 
 #Preview {
+    @Previewable @State  var coordinator = Coordinator<MainCoordinatorPages>()
+
     SkillDetailView(skill: Skill.sample, activeTab: .constant(.home))
+        .environment(coordinator)
 }

@@ -47,10 +47,11 @@ struct HomeView: View {
            GridItem(.flexible(), spacing: 10),
            GridItem(.flexible(), spacing: 10) 
        ]
-    // Selected skill for navigation
-    @State private var selectedSkill: Skill?
     // Active tab
     @Binding var activeTab: TabModel
+    // Coordinator navigation
+    @Environment(Coordinator<MainCoordinatorPages>.self) private var coordinator
+
     
     // MARK: - BODY
     var body: some View {
@@ -106,9 +107,6 @@ struct HomeView: View {
             }
            
         }
-        .fullScreenCover(item: $selectedSkill) { skill in
-            SkillDetailView(skill: skill, activeTab: $activeTab)
-        }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(ColorManager.bgColor)
     }
@@ -143,7 +141,6 @@ extension HomeView {
                     .padding(.horizontal, Measures.kHomeHorizontalPadding)
                     deleteFiltersButtons
 
-                    Text("\(interpolatedOpacity)")
                     if minY > 120 {
                         ProgressView()
                             .padding(.top, 50)
@@ -253,7 +250,7 @@ extension HomeView {
             
             ForEach(filteredSkills) { skill in
                 Button {
-                    selectedSkill = skill
+                    coordinator.push(.skillDetail(skill: skill, activeTab: $activeTab))
                 } label: {
                     SkillRowView(skill: skill)
                 }
@@ -272,12 +269,14 @@ struct CategoriesView_Previews: PreviewProvider {
             FSCategory(id: "2", name: "Carpintería", is_manual: true),
             FSCategory(id: "3", name: "Clases online", is_manual: false),
         ]
-        
+        @Previewable @State  var coordinator = Coordinator<MainCoordinatorPages>()
+
         mockManager.allSkillsSaved = []
         return GeometryReader { proxy in
             HomeView(proxy: proxy, activeTab: .constant(.home))
                 .environment(AuthenticatorManager())
                 .environmentObject(mockManager)
+                .environment(coordinator)
                 .ignoresSafeArea()
         }
         .previewLayout(.sizeThatFits)
